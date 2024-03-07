@@ -1,20 +1,20 @@
 import $ from "jquery";
 
 export class Panel {
-  constructor(game, levels, playerLevel) {
-    this.createLevelSelect(game, levels, playerLevel);
+  constructor(game) {
+    this.game = game;
   }
 
   clearPanel = () => {
     $("#panel").empty();
   };
 
-  createLevelSelect = (game, levels, playerLevel) => {
+  showSelectLevel = () => {
     const select = $("<select>").attr("id", "levelSelect");
-    for (let level in levels) {
+    for (let level in this.game.levels) {
       const option = $("<option>")
-        .attr("disabled", playerLevel < level)
-        .attr("selected", playerLevel == level)
+        .attr("disabled", this.game.playerLevel < level)
+        .attr("selected", this.game.playerLevel == level)
         .attr("label", level)
         .attr("value", level);
       select.append(option);
@@ -23,9 +23,10 @@ export class Panel {
     const button = $("<button>")
       .text("START")
       .on("click", () => {
-        game.setBoard($("#levelSelect").val());
+        this.game.prepareGame($("#levelSelect").val());
         this.clearPanel();
       });
     $("#panel").append(button);
+    button.trigger("click"); // to delete
   };
 }

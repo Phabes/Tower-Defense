@@ -3,12 +3,21 @@ import $ from "jquery";
 import { getLevels } from "./net";
 import { Board } from "./board";
 import { Panel } from "./panel";
+import { Player } from "./player";
+import { Camera } from "./camera";
+import { Renderer } from "./renderer";
 
 export class Game {
-  constructor() {
+  constructor(scene, camera, renderer) {
     this.levels = [];
-
     this.playerLevel = this.getPlayerLevel();
+
+    this.scene = scene;
+    this.camera = new Camera(this, camera);
+    this.renderer = new Renderer(this, camera, renderer);
+    this.panel = new Panel(this);
+    this.board = new Board(this);
+    this.player = new Player(4, 500);
 
     this.retrieveLevels();
   }
@@ -50,15 +59,15 @@ export class Game {
     getLevels().done((res) => {
       const levels = res.levels;
       this.levels = levels;
-      this.prepareGame();
+      this.panel.showSelectLevel();
     });
   };
 
-  prepareGame = () => {
-    this.panel = new Panel(this, this.levels, this.playerLevel);
-  };
-
-  setBoard = (index) => {
-    this.board = new Board(this.levels[index]);
+  prepareGame = (index) => {
+    this.board.createBoard(this.levels[index]);
+    this.renderer.setRendererSize();
+    this.board.createPlayerStats();
+    this.camera.setCamera();
+    this.renderer.renderGame();
   };
 }

@@ -6,7 +6,7 @@ Instruction to run project:
 
 1. Clone project.
    ```javascript
-   git clone https://github.com/Phabes/ Tower-Defence.git
+   git clone https://github.com/Phabes/Tower-Defence.git
    ```
 1. Open "backend" folder in command line.
 1. Run:
