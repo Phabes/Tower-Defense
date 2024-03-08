@@ -24,9 +24,22 @@ export class Panel {
       .text("START")
       .on("click", () => {
         this.game.prepareGame($("#levelSelect").val());
-        this.clearPanel();
       });
     $("#panel").append(button);
     button.trigger("click"); // to delete
+  };
+
+  setTimer = (time) => {
+    this.clearPanel();
+    const timer = $("<div>").text(time--);
+    $("#panel").append(timer);
+    const interval = setInterval(() => {
+      if (time == 0) {
+        clearInterval(interval);
+        this.clearPanel();
+        this.game.startRound();
+      }
+      timer.text(time--);
+    }, 1000);
   };
 }

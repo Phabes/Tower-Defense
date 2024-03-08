@@ -84,7 +84,6 @@ export class Board {
     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     this.coin = new THREE.Mesh(geometry, material);
     this.coin.position.set(200, 400, 100);
-
     this.game.scene.add(this.coin);
   };
 
@@ -95,5 +94,13 @@ export class Board {
     this.coin.rotation.z += 0.01;
 
     this.game.renderer.renderGame();
+  };
+
+  setRound = (round) => {
+    this.round = round;
+  };
+
+  startRound = () => {
+    console.log("BEGIN");
   };
 }
