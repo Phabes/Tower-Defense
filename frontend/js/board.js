@@ -1,45 +1,121 @@
 import * as THREE from "three";
+import { Enemy } from "./enemy";
+import { settings } from "./settings";
+import { Field } from "./field";
 
 export class Board {
   constructor(game) {
     this.game = game;
-    this.squareSize = 100;
-    this.spaceBetween = 4;
+    this.fields = [];
+    this.enemies = [];
   }
 
-  createBoard = (board) => {
-    const game = new THREE.Group();
-    game.position.set(
-      -(board[0].length * this.squareSize + (board[0].length - 1) * 2) / 2,
-      -(board.length * this.squareSize + (board.length - 1) * 2) / 2,
+  setLevel = (level) => {
+    this.level = level;
+  };
+
+  createBoard = () => {
+    this.boardGroup = new THREE.Group();
+    this.boardGroup.position.set(
+      -(
+        this.level.map[0].length * settings.FIELD_SIZE +
+        (this.level.map[0].length - 1) * 2
+      ) / 2,
+      -(
+        this.level.map.length * settings.FIELD_SIZE +
+        (this.level.map.length - 1) * 2
+      ) / 2,
       0
     );
 
-    for (let i = 0; i < board.length; i++) {
-      for (let j = 0; j < board[i].length; j++) {
-        const geometry = new THREE.PlaneGeometry(
-          this.squareSize,
-          this.squareSize
+    for (let i = 0; i < this.level.map.length; i++) {
+      const row = [];
+      for (let j = 0; j < this.level.map[i].length; j++) {
+        const field = new Field(
+          i,
+          j,
+          this.level.map[i][j].type,
+          this.level.map.length
         );
-        const material = new THREE.MeshBasicMaterial({
-          color:
-            board[i][j].type == "grass"
-              ? 0x00ff00
-              : board[i][j].type == "path"
-              ? 0xffff00
-              : 0xff0000,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(
-          j * (this.squareSize + this.spaceBetween) + this.squareSize / 2,
-          (board.length - i - 1) * (this.squareSize + this.spaceBetween) +
-            this.squareSize / 2,
-          0
-        );
-        game.add(mesh);
+        row.push(field);
+        this.boardGroup.add(field.createField());
+      }
+      this.fields.push(row);
+    }
+    this.game.scene.add(this.boardGroup);
+
+    this.setPath();
+    this.animate();
+  };
+
+  setPath = () => {
+    for (let i = 0; i < this.fields.length; i++) {
+      for (let j = 0; j < this.fields[i].length; j++) {
+        if (this.fields[i][j].type == "path") {
+          this.fields[i][j].setNextFields(
+            this.findNextFields(this.level.map[i][j].id + 1)
+          );
+        }
       }
     }
-    this.game.scene.add(game);
+  };
+
+  findNextFields = (id) => {
+    const nextFields = [];
+    for (const i in this.level.map) {
+      for (const j in this.level.map[i]) {
+        if (
+          this.level.map[i][j].type == "path" &&
+          this.level.map[i][j].id == id
+        ) {
+          nextFields.push(this.fields[i][j]);
+        }
+      }
+    }
+    return nextFields;
+  };
+
+  getRandomFirstField = (firstFields) => {
+    return firstFields[Math.floor(Math.random() * firstFields.length)];
+  };
+
+  setRound = (round) => {
+    this.round = round;
+  };
+
+  startRound = () => {
+    this.spawnEnemies(this.level.waves[this.round].enemies);
+  };
+
+  spawnEnemies = (numberOfEnemies) => {
+    this.enemiesGroup = new THREE.Group();
+    this.boardGroup.add(this.enemiesGroup);
+
+    const startField = this.getRandomFirstField(this.findNextFields(0));
+    const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
+    this.enemies.push(enemy);
+    this.enemiesGroup.add(enemy.spawn());
+    numberOfEnemies--;
+
+    const interval = setInterval(() => {
+      if (numberOfEnemies == 0) {
+        clearInterval(interval);
+        return;
+      }
+      const startField = this.getRandomFirstField(this.findNextFields(0));
+      const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
+      this.enemies.push(enemy);
+      this.enemiesGroup.add(enemy.spawn());
+      numberOfEnemies--;
+    }, 1000);
+  };
+
+  enemyFinishedPath = (enemy) => {
+    const index = this.enemies.indexOf(enemy);
+    this.enemies.splice(index, 1);
+    this.enemiesGroup.remove(enemy.mesh);
+    //to do
+    //damage
   };
 
   createPlayerStats = () => {
@@ -90,17 +166,12 @@ export class Board {
   animate = () => {
     requestAnimationFrame(this.animate);
 
-    this.heart.rotation.y += 0.01;
-    this.coin.rotation.z += 0.01;
+    // this.heart.rotation.y += 0.01;
+    // this.coin.rotation.z += 0.01;
+    for (const enemy of this.enemies) {
+      enemy.move();
+    }
 
     this.game.renderer.renderGame();
-  };
-
-  setRound = (round) => {
-    this.round = round;
-  };
-
-  startRound = () => {
-    console.log("BEGIN");
   };
 }

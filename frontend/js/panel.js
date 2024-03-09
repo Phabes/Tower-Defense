@@ -38,6 +38,7 @@ export class Panel {
         clearInterval(interval);
         this.clearPanel();
         this.game.startRound();
+        return;
       }
       timer.text(time--);
     }, 1000);

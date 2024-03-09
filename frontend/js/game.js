@@ -64,10 +64,11 @@ export class Game {
   };
 
   prepareGame = (index) => {
-    this.board.createBoard(this.levels[index].map);
+    this.board.setLevel(this.levels[index]);
+    this.board.createBoard();
     this.panel.clearPanel();
     this.renderer.setRendererSize();
-    this.board.createPlayerStats();
+    // this.board.createPlayerStats();
     this.camera.setCamera();
     this.renderer.renderGame();
     this.board.setRound(0);
