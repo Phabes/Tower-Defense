@@ -15,7 +15,7 @@ export class Game {
     this.scene = scene;
     this.camera = new Camera(this.scene, camera);
     this.renderer = new Renderer(this.scene, camera, renderer);
-    this.player = new Player(4, 500);
+    this.player = new Player(20, 500);
     this.panel = new Panel(this);
     this.board = new Board(this);
 
@@ -71,8 +71,8 @@ export class Game {
     // this.board.createPlayerStats();
     this.camera.setCamera();
     this.renderer.renderGame();
-    this.board.setRound(0);
-    this.panel.setTimer(this.levels[index].waves[0].timer);
+    this.board.prepareRound(0);
+    // this.panel.setTimer(this.levels[index].waves[0].timer);
   };
 
   startRound = () => {

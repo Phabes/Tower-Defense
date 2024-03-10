@@ -79,8 +79,9 @@ export class Board {
     return firstFields[Math.floor(Math.random() * firstFields.length)];
   };
 
-  setRound = (round) => {
+  prepareRound = (round) => {
     this.round = round;
+    this.game.panel.setTimer(this.level.waves[this.round].timer);
   };
 
   startRound = () => {
@@ -119,6 +120,15 @@ export class Board {
     this.game.panel.showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
       cancelAnimationFrame(this.animations);
+      return;
+    }
+    if (this.enemies.length == 0) {
+      const nextRound = this.round + 1;
+      if (nextRound >= this.level.waves.length) {
+        console.log("level completed");
+        return;
+      }
+      this.prepareRound(this.round + 1);
     }
   };
 
