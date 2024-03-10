@@ -15,9 +15,9 @@ export class Game {
     this.scene = scene;
     this.camera = new Camera(this.scene, camera);
     this.renderer = new Renderer(this.scene, camera, renderer);
+    this.player = new Player(4, 500);
     this.panel = new Panel(this);
     this.board = new Board(this);
-    this.player = new Player(4, 500);
 
     this.retrieveLevels();
   }

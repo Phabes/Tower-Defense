@@ -85,6 +85,7 @@ export class Board {
 
   startRound = () => {
     this.spawnEnemies(this.level.waves[this.round].enemies);
+    this.game.panel.showPlayerStats(this.game.player);
   };
 
   spawnEnemies = (numberOfEnemies) => {
@@ -114,8 +115,11 @@ export class Board {
     const index = this.enemies.indexOf(enemy);
     this.enemies.splice(index, 1);
     this.enemiesGroup.remove(enemy.mesh);
-    //to do
-    //damage
+    this.game.player.takeDamage(1);
+    this.game.panel.showPlayerStats(this.game.player);
+    if (this.game.player.hp == 0) {
+      cancelAnimationFrame(this.animations);
+    }
   };
 
   createPlayerStats = () => {
@@ -164,7 +168,7 @@ export class Board {
   };
 
   animate = () => {
-    requestAnimationFrame(this.animate);
+    this.animations = requestAnimationFrame(this.animate);
 
     // this.heart.rotation.y += 0.01;
     // this.coin.rotation.z += 0.01;

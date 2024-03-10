@@ -43,4 +43,13 @@ export class Panel {
       timer.text(time--);
     }, 1000);
   };
+
+  showPlayerStats = (player) => {
+    this.clearPanel();
+    const panel = $("#panel");
+    const hp = $("<div>").text(player.hp);
+    const money = $("<div>").text(player.money);
+    panel.append(hp);
+    panel.append(money);
+  };
 }

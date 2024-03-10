@@ -4,7 +4,7 @@ export class Player {
     this.money = money;
   }
 
-  damageTaken = (damage) => {
+  takeDamage = (damage) => {
     this.hp -= damage;
   };
 
