@@ -8,14 +8,23 @@ export class Board {
     this.game = game;
     this.fields = [];
     this.enemies = [];
+    this.boardGroup = new THREE.Group();
+    this.enemiesGroup = new THREE.Group();
   }
 
   setLevel = (level) => {
     this.level = level;
   };
 
+  clearBoard = () => {
+    this.boardGroup.clear();
+    this.fields = [];
+    this.enemiesGroup.clear();
+    this.enemies = [];
+  };
+
   createBoard = () => {
-    this.boardGroup = new THREE.Group();
+    this.clearBoard();
     this.boardGroup.position.set(
       -(
         this.level.map[0].length * settings.FIELD_SIZE +
@@ -88,7 +97,6 @@ export class Board {
   };
 
   spawnEnemies = (numberOfEnemies) => {
-    this.enemiesGroup = new THREE.Group();
     this.boardGroup.add(this.enemiesGroup);
 
     const startField = this.getRandomFirstField();
@@ -121,12 +129,15 @@ export class Board {
       return;
     }
     if (this.enemies.length == 0) {
+      //need to fix it when enemy ends path but not all enemies spawned
       const nextRound = this.round + 1;
       if (nextRound >= this.level.waves.length) {
         console.log("level completed");
+        cancelAnimationFrame(this.animations);
+        this.game.levelCompleted(this.level);
         return;
       }
-      this.prepareRound(this.round + 1);
+      this.prepareRound(nextRound);
     }
   };
 

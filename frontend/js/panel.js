@@ -10,11 +10,15 @@ export class Panel {
   };
 
   showSelectLevel = () => {
+    this.clearPanel();
     const select = $("<select>").attr("id", "levelSelect");
     for (let level in this.game.levels) {
       const option = $("<option>")
-        .attr("disabled", this.game.playerLevel < level)
-        .attr("selected", this.game.playerLevel == level)
+        .attr("disabled", this.game.player.level < level)
+        .attr(
+          "selected",
+          Math.min(this.game.player.level, this.game.levels.length - 1) == level
+        )
         .attr("label", level)
         .attr("value", level);
       select.append(option);
@@ -26,7 +30,7 @@ export class Panel {
         this.game.prepareGame($("#levelSelect").val());
       });
     $("#panel").append(button);
-    button.trigger("click"); // to delete
+    // button.trigger("click"); // to delete
   };
 
   setTimer = (time) => {
