@@ -52,31 +52,29 @@ export class Board {
     for (let i = 0; i < this.fields.length; i++) {
       for (let j = 0; j < this.fields[i].length; j++) {
         if (this.fields[i][j].type == "path") {
-          this.fields[i][j].setNextFields(
-            this.findNextFields(this.level.map[i][j].id + 1)
+          const nextFields = this.findNextFields(
+            this.level.map[i][j].nextFields
           );
+          this.fields[i][j].setNextFields(nextFields);
         }
       }
     }
   };
 
-  findNextFields = (id) => {
+  findNextFields = (coords) => {
     const nextFields = [];
-    for (const i in this.level.map) {
-      for (const j in this.level.map[i]) {
-        if (
-          this.level.map[i][j].type == "path" &&
-          this.level.map[i][j].id == id
-        ) {
-          nextFields.push(this.fields[i][j]);
-        }
-      }
+    for (const coord of coords) {
+      nextFields.push(this.fields[coord.y][coord.x]);
     }
     return nextFields;
   };
 
-  getRandomFirstField = (firstFields) => {
-    return firstFields[Math.floor(Math.random() * firstFields.length)];
+  getRandomFirstField = () => {
+    const coordIndex = Math.floor(
+      Math.random() * this.level.startingCoords.length
+    );
+    const startingCoord = this.level.startingCoords[coordIndex];
+    return this.fields[startingCoord.y][startingCoord.x];
   };
 
   prepareRound = (round) => {
@@ -93,7 +91,7 @@ export class Board {
     this.enemiesGroup = new THREE.Group();
     this.boardGroup.add(this.enemiesGroup);
 
-    const startField = this.getRandomFirstField(this.findNextFields(0));
+    const startField = this.getRandomFirstField();
     const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
     this.enemies.push(enemy);
     this.enemiesGroup.add(enemy.spawn());
@@ -104,7 +102,7 @@ export class Board {
         clearInterval(interval);
         return;
       }
-      const startField = this.getRandomFirstField(this.findNextFields(0));
+      const startField = this.getRandomFirstField();
       const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
       this.enemies.push(enemy);
       this.enemiesGroup.add(enemy.spawn());
