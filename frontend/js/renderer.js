@@ -1,8 +1,8 @@
 import $ from "jquery";
 
 export class Renderer {
-  constructor(game, camera, renderer) {
-    this.game = game;
+  constructor(scene, camera, renderer) {
+    this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
   }
@@ -18,6 +18,6 @@ export class Renderer {
   };
 
   renderGame = () => {
-    this.renderer.render(this.game.scene, this.camera);
+    this.renderer.render(this.scene, this.camera);
   };
 }
