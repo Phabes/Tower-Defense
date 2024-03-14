@@ -7,7 +7,17 @@ export class Enemy {
     this.currentField = currentField;
     this.nextField = currentField.getRandomNextField();
     this.enemyFinishedPath = enemyFinishedPath;
+    this.alive = false;
+    this.active = true;
   }
+
+  setAlive = (alive) => {
+    this.alive = alive;
+  };
+
+  setActive = (active) => {
+    this.active = active;
+  };
 
   spawn = () => {
     const geometry = new THREE.SphereGeometry(50);
