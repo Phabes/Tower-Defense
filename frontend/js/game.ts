@@ -1,11 +1,22 @@
+import * as THREE from "three";
 import { getLevels } from "./net";
 import { Board } from "./board";
 import { Panel } from "./panel";
 import { Player } from "./player";
 import { windowResize } from "./ui";
+import { Camera } from "./camera";
+import { Renderer } from "./renderer";
+import { Level } from "./types";
 
 export class Game {
-  constructor(scene, camera, renderer) {
+  levels: Level[];
+  scene: THREE.Scene;
+  camera: Camera;
+  renderer: Renderer;
+  player: Player;
+  panel: Panel;
+  board: Board;
+  constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
     this.levels = [];
 
     this.scene = scene;
@@ -34,7 +45,7 @@ export class Game {
     this.panel.showSelectLevel();
   };
 
-  prepareGame = (index) => {
+  prepareGame = (index: number) => {
     this.board.setLevel(this.levels[index]);
     this.board.createBoard();
     this.panel.clearPanel();
