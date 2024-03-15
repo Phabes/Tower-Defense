@@ -21,7 +21,7 @@ export class Enemy {
     enemyFinishedPath: (e: Enemy) => void
   ) {
     this.hp = hp;
-    this.speed = 1;
+    this.speed = speed;
     this.currentField = currentField;
     this.nextField = currentField.getRandomNextField();
     this.enemyFinishedPath = enemyFinishedPath;
