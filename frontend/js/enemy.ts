@@ -1,9 +1,27 @@
 import * as THREE from "three";
+import { Field } from "./field";
 
 export class Enemy {
-  constructor(hp, speed, currentField, enemyFinishedPath) {
+  hp: number;
+  speed: number;
+  currentField: Field;
+  nextField: Field | null;
+  enemyFinishedPath: (e: Enemy) => void;
+  alive: boolean;
+  active: boolean;
+  mesh: THREE.Mesh<
+    THREE.SphereGeometry,
+    THREE.MeshBasicMaterial,
+    THREE.Object3DEventMap
+  >;
+  constructor(
+    hp: number,
+    speed: number,
+    currentField: Field,
+    enemyFinishedPath: (e: Enemy) => void
+  ) {
     this.hp = hp;
-    this.speed = 1;
+    this.speed = speed;
     this.currentField = currentField;
     this.nextField = currentField.getRandomNextField();
     this.enemyFinishedPath = enemyFinishedPath;
@@ -11,11 +29,11 @@ export class Enemy {
     this.active = true;
   }
 
-  setAlive = (alive) => {
+  setAlive = (alive: boolean) => {
     this.alive = alive;
   };
 
-  setActive = (active) => {
+  setActive = (active: boolean) => {
     this.active = active;
   };
 
@@ -32,9 +50,12 @@ export class Enemy {
   };
 
   move = () => {
+    if (this.nextField == null) {
+      return;
+    }
     const direction = new THREE.Vector3(
-      this.nextField.x - this.currentField.x,
-      -(this.nextField.y - this.currentField.y)
+      this.nextField.coord.x - this.currentField.coord.x,
+      -(this.nextField.coord.y - this.currentField.coord.y)
     );
     this.mesh.position.add(direction.multiplyScalar(this.speed));
     if (this.checkFieldChange()) {
@@ -47,6 +68,9 @@ export class Enemy {
   };
 
   checkFieldChange = () => {
+    if (this.nextField == null) {
+      return false;
+    }
     const distanceToEnemy = this.currentField.position.distanceTo(
       this.mesh.position
     );

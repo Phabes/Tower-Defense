@@ -1,22 +1,32 @@
 import * as THREE from "three";
 import { settings } from "./settings";
+import { Coord, Surface } from "./types";
 
 export class Field {
-  constructor(y, x, type, mapSizeY) {
-    this.y = y;
-    this.x = x;
+  coord: Coord;
+  type: Surface;
+  nextFields: Field[];
+  position: THREE.Vector3;
+  mesh: THREE.Mesh<
+    THREE.PlaneGeometry,
+    THREE.MeshBasicMaterial,
+    THREE.Object3DEventMap
+  >;
+  constructor(coord: Coord, type: Surface, mapSizeY: number) {
+    this.coord = coord;
     this.type = type;
     this.nextFields = [];
     this.position = new THREE.Vector3(
-      x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+      this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
         settings.FIELD_SIZE / 2,
-      (mapSizeY - y - 1) * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+      (mapSizeY - this.coord.y - 1) *
+        (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
         settings.FIELD_SIZE / 2,
       0
     );
   }
 
-  setNextFields = (nextFields) => {
+  setNextFields = (nextFields: Field[]) => {
     this.nextFields = nextFields;
   };
 
