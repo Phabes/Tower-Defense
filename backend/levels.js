@@ -98,26 +98,26 @@ exports.levels = [
       },
     ],
   },
-  {
-    map: [
-      [{ type: "grass" }, { type: "grass" }, { type: "grass" }],
-      [
-        { type: "path", nextFields: [{ y: 1, x: 1 }] },
-        { type: "path", nextFields: [{ y: 1, x: 2 }] },
-        { type: "path", nextFields: [] },
-      ],
-      [{ type: "grass" }, { type: "grass" }, { type: "grass" }],
-    ],
-    waves: [
-      { timer: 2, enemies: 5 },
-      { timer: 9, enemies: 4 },
-      { timer: 8, enemies: 3 },
-    ],
-    startingCoords: [
-      {
-        y: 1,
-        x: 0,
-      },
-    ],
-  },
+  // {
+  //   map: [
+  //     [{ type: "grass" }, { type: "grass" }, { type: "grass" }],
+  //     [
+  //       { type: "path", nextFields: [{ y: 1, x: 1 }] },
+  //       { type: "path", nextFields: [{ y: 1, x: 2 }] },
+  //       { type: "path", nextFields: [] },
+  //     ],
+  //     [{ type: "grass" }, { type: "grass" }, { type: "grass" }],
+  //   ],
+  //   waves: [
+  //     { timer: 2, enemies: 5 },
+  //     { timer: 9, enemies: 4 },
+  //     { timer: 8, enemies: 3 },
+  //   ],
+  //   startingCoords: [
+  //     {
+  //       y: 1,
+  //       x: 0,
+  //     },
+  //   ],
+  // },
 ];
