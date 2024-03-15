@@ -1,7 +1,11 @@
 import { settings } from "./settings";
 
 export class Player {
-  constructor(hp, money) {
+  hp: number;
+  maxHP: number;
+  money: number;
+  level: number;
+  constructor(hp: number, money: number) {
     this.hp = hp;
     this.maxHP = hp;
     this.money = money;
@@ -12,43 +16,43 @@ export class Player {
     this.hp = this.maxHP;
   };
 
-  takeDamage = (damage) => {
+  takeDamage = (damage: number) => {
     this.hp -= damage;
   };
 
-  addMoney = (money) => {
+  addMoney = (money: number) => {
     this.money += money;
   };
 
-  substractMoney = (money) => {
+  substractMoney = (money: number) => {
     this.money -= money;
   };
 
-  changePlayerLevel = (level) => {
+  changePlayerLevel = (level: number) => {
     if (level > this.level) {
       this.level = level;
-      this.setCookie(settings.COOKIE, level, 1);
+      this.setCookie(settings.COOKIE, level.toString(), 1);
     }
   };
 
   getPlayerLevel = () => {
     const playerLevel = this.getCookie(settings.COOKIE);
     if (playerLevel == "") {
-      this.setCookie(settings.COOKIE, 0, 1);
+      this.setCookie(settings.COOKIE, "0", 1);
     } else {
       this.setCookie(settings.COOKIE, playerLevel, 1);
     }
-    return this.getCookie(settings.COOKIE);
+    return parseInt(this.getCookie(settings.COOKIE));
   };
 
-  setCookie = (cname, cvalue, exdays) => {
+  setCookie = (cname: string, cvalue: string, exdays: number) => {
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
   };
 
-  getCookie = (cname) => {
+  getCookie = (cname: string) => {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(";");

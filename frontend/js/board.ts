@@ -3,9 +3,30 @@ import { Enemy } from "./enemy";
 import { settings } from "./settings";
 import { Field } from "./field";
 import { boardClick, getBoardElement } from "./ui";
+import { Game } from "./game";
+import { Coord, Level } from "./types";
 
 export class Board {
-  constructor(game) {
+  game: Game;
+  fields: Field[][];
+  enemies: Enemy[];
+  boardGroup: THREE.Group<THREE.Object3DEventMap>;
+  enemiesGroup: THREE.Group<THREE.Object3DEventMap>;
+  raycaster: THREE.Raycaster;
+  level: Level;
+  round: number;
+  animations: number;
+  heart: THREE.Mesh<
+    THREE.ExtrudeGeometry,
+    THREE.MeshBasicMaterial,
+    THREE.Object3DEventMap
+  >;
+  coin: THREE.Mesh<
+    THREE.CylinderGeometry,
+    THREE.MeshBasicMaterial,
+    THREE.Object3DEventMap
+  >;
+  constructor(game: Game) {
     this.game = game;
     this.fields = [];
     this.enemies = [];
@@ -15,11 +36,11 @@ export class Board {
     boardClick(this.click);
   }
 
-  click = (event) => {
+  click = (event: JQuery.ClickEvent) => {
     const pointer = new THREE.Vector2();
     const boardElement = getBoardElement();
-    pointer.x = (event.clientX / boardElement.width()) * 2 - 1;
-    pointer.y = -(event.clientY / boardElement.height()) * 2 + 1;
+    pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
+    pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
     this.raycaster.setFromCamera(pointer, this.game.camera);
 
     const intersects = this.raycaster.intersectObjects(
@@ -28,12 +49,12 @@ export class Board {
     if (intersects.length > 0) {
       console.log(intersects);
       for (let i = 0; i < intersects.length; i++) {
-        intersects[i].object.material.color.set(0xff0000);
+        // intersects[i].object.material.color.set(0xff0000);
       }
     }
   };
 
-  setLevel = (level) => {
+  setLevel = (level: Level) => {
     this.level = level;
   };
 
@@ -49,17 +70,16 @@ export class Board {
     this.setGroupPosition(this.boardGroup);
 
     for (let i = 0; i < this.level.map.length; i++) {
-      const row = [];
+      const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
+        const coord = { y: i, x: j };
         const field = new Field(
-          i,
-          j,
+          coord,
           this.level.map[i][j].type,
           this.level.map.length
         );
         row.push(field);
         this.boardGroup.add(field.createField());
-        // this.game.scene.add(field.createField());
       }
       this.fields.push(row);
     }
@@ -69,7 +89,7 @@ export class Board {
     this.animate();
   };
 
-  setGroupPosition = (element) => {
+  setGroupPosition = (element: THREE.Group) => {
     element.position.set(
       -(
         this.level.map[0].length * settings.FIELD_SIZE +
@@ -88,7 +108,7 @@ export class Board {
       for (let j = 0; j < this.fields[i].length; j++) {
         if (this.fields[i][j].type == "path") {
           const nextFields = this.findNextFields(
-            this.level.map[i][j].nextFields
+            this.level.map[i][j].nextCoords!
           );
           this.fields[i][j].setNextFields(nextFields);
         }
@@ -96,8 +116,8 @@ export class Board {
     }
   };
 
-  findNextFields = (coords) => {
-    const nextFields = [];
+  findNextFields = (coords: Coord[]) => {
+    const nextFields: Field[] = [];
     for (const coord of coords) {
       nextFields.push(this.fields[coord.y][coord.x]);
     }
@@ -112,7 +132,7 @@ export class Board {
     return this.fields[startingCoord.y][startingCoord.x];
   };
 
-  prepareRound = (round) => {
+  prepareRound = (round: number) => {
     this.round = round;
     this.game.panel.setTimer(this.level.waves[this.round].timer);
   };
@@ -123,7 +143,7 @@ export class Board {
     this.game.panel.showPlayerStats(this.game.player);
   };
 
-  spawnEnemies = (numberOfEnemies) => {
+  spawnEnemies = (numberOfEnemies: number) => {
     this.setGroupPosition(this.enemiesGroup);
     this.game.scene.add(this.enemiesGroup);
 
@@ -147,7 +167,7 @@ export class Board {
     }, 1000);
   };
 
-  enemyFinishedPath = (enemy) => {
+  enemyFinishedPath = (enemy: Enemy) => {
     const index = this.enemies.indexOf(enemy);
     this.enemies[index].setAlive(false);
     this.enemies[index].setActive(false);
