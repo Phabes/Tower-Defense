@@ -1,23 +1,30 @@
-import $ from "jquery";
+import * as THREE from "three";
+import { getBoardElement } from "./ui";
 
-export class Renderer {
-  constructor(scene, camera, renderer) {
+export class Renderer extends THREE.WebGLRenderer {
+  constructor(scene, camera) {
+    super();
     this.scene = scene;
     this.camera = camera;
-    this.renderer = renderer;
+
+    const boardElement = getBoardElement();
+    this.setRendererSize(boardElement);
+    this.addRenderer(boardElement);
   }
 
-  setRendererSize = () => {
-    const boardElement = $("#board");
+  setRendererSize = (boardElement) => {
     boardElement.empty();
+    this.setSize(boardElement.width(), boardElement.height());
 
-    this.renderer.setSize(boardElement.width(), boardElement.height());
-
-    boardElement.append(this.renderer.domElement);
+    this.addRenderer(boardElement);
     this.renderGame();
   };
 
+  addRenderer = (boardElement) => {
+    boardElement.append(this.domElement);
+  };
+
   renderGame = () => {
-    this.renderer.render(this.scene, this.camera);
+    this.render(this.scene, this.camera);
   };
 }

@@ -1,16 +1,13 @@
 import * as THREE from "three";
 import $ from "jquery";
 import { Game } from "./game";
+import { Camera } from "./camera";
+import { Renderer } from "./renderer";
 
 $(document).ready(function () {
-  const boardElement = $("#board");
-
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(
-    50,
-    boardElement.width() / boardElement.height()
-  );
-  const renderer = new THREE.WebGLRenderer();
+  const camera = new Camera(scene);
+  const renderer = new Renderer(scene, camera);
 
   new Game(scene, camera, renderer);
 });

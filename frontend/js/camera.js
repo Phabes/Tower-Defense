@@ -1,12 +1,16 @@
-export class Camera {
-  constructor(scene, camera) {
-    this.scene = scene;
-    this.camera = camera;
+import * as THREE from "three";
+import $ from "jquery";
+import { getBoardElement } from "./ui";
+
+export class Camera extends THREE.PerspectiveCamera {
+  constructor(scene) {
+    const boardElement = getBoardElement();
+    super(50, boardElement.width() / boardElement.height());
+    scene.add(this);
   }
 
-  setCamera = () => {
-    this.camera.position.set(0, -600, 1000);
-    this.camera.lookAt(0, 0, 0);
-    this.scene.add(this.camera);
+  setCamera = (se) => {
+    this.position.set(0, -600, 1000);
+    this.lookAt(0, 0, 0);
   };
 }
