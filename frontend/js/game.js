@@ -30,6 +30,7 @@ export class Game {
   levelCompleted = (level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
+    this.player.levelCompleted();
     this.panel.showSelectLevel();
   };
 

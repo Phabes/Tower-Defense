@@ -92,6 +92,7 @@ export class Board {
   };
 
   startRound = () => {
+    this.enemies = [];
     this.spawnEnemies(this.level.waves[this.round].enemies);
     this.game.panel.showPlayerStats(this.game.player);
   };
@@ -100,27 +101,30 @@ export class Board {
     this.boardGroup.add(this.enemiesGroup);
 
     const startField = this.getRandomFirstField();
-    const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
-    this.enemies.push(enemy);
-    this.enemiesGroup.add(enemy.spawn());
-    numberOfEnemies--;
+    for (let i = 0; i < numberOfEnemies; i++) {
+      const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
+      this.enemies.push(enemy);
+    }
 
+    let index = 0;
+    this.enemiesGroup.add(this.enemies[index].spawn());
+    this.enemies[index].setAlive(true);
     const interval = setInterval(() => {
-      if (numberOfEnemies == 0) {
+      index++;
+      if (index == numberOfEnemies) {
         clearInterval(interval);
         return;
       }
-      const startField = this.getRandomFirstField();
-      const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
-      this.enemies.push(enemy);
-      this.enemiesGroup.add(enemy.spawn());
-      numberOfEnemies--;
+      this.enemiesGroup.add(this.enemies[index].spawn());
+      this.enemies[index].setAlive(true);
     }, 1000);
   };
 
   enemyFinishedPath = (enemy) => {
     const index = this.enemies.indexOf(enemy);
-    this.enemies.splice(index, 1);
+    this.enemies[index].setAlive(false);
+    this.enemies[index].setActive(false);
+    // this.enemies.splice(index, 1);
     this.enemiesGroup.remove(enemy.mesh);
     this.game.player.takeDamage(1);
     this.game.panel.showPlayerStats(this.game.player);
@@ -128,8 +132,8 @@ export class Board {
       cancelAnimationFrame(this.animations);
       return;
     }
-    if (this.enemies.length == 0) {
-      //need to fix it when enemy ends path but not all enemies spawned
+    const activeEnemies = this.enemies.filter((e) => e.active).length;
+    if (activeEnemies == 0) {
       const nextRound = this.round + 1;
       if (nextRound >= this.level.waves.length) {
         console.log("level completed");
@@ -192,7 +196,9 @@ export class Board {
     // this.heart.rotation.y += 0.01;
     // this.coin.rotation.z += 0.01;
     for (const enemy of this.enemies) {
-      enemy.move();
+      if (enemy.alive) {
+        enemy.move();
+      }
     }
 
     this.game.renderer.renderGame();
