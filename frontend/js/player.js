@@ -3,9 +3,14 @@ import { settings } from "./settings";
 export class Player {
   constructor(hp, money) {
     this.hp = hp;
+    this.maxHP = hp;
     this.money = money;
     this.level = this.getPlayerLevel();
   }
+
+  levelCompleted = () => {
+    this.hp = this.maxHP;
+  };
 
   takeDamage = (damage) => {
     this.hp -= damage;
