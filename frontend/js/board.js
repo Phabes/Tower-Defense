@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Enemy } from "./enemy";
 import { settings } from "./settings";
 import { Field } from "./field";
+import { boardClick, getBoardElement } from "./ui";
 
 export class Board {
   constructor(game) {
@@ -10,7 +11,27 @@ export class Board {
     this.enemies = [];
     this.boardGroup = new THREE.Group();
     this.enemiesGroup = new THREE.Group();
+    this.raycaster = new THREE.Raycaster();
+    boardClick(this.click);
   }
+
+  click = (event) => {
+    const pointer = new THREE.Vector2();
+    const boardElement = getBoardElement();
+    pointer.x = (event.clientX / boardElement.width()) * 2 - 1;
+    pointer.y = -(event.clientY / boardElement.height()) * 2 + 1;
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    if (intersects.length > 0) {
+      console.log(intersects);
+      for (let i = 0; i < intersects.length; i++) {
+        intersects[i].object.material.color.set(0xff0000);
+      }
+    }
+  };
 
   setLevel = (level) => {
     this.level = level;
@@ -48,6 +69,7 @@ export class Board {
         );
         row.push(field);
         this.boardGroup.add(field.createField());
+        // this.game.scene.add(field.createField());
       }
       this.fields.push(row);
     }
@@ -195,6 +217,7 @@ export class Board {
 
     // this.heart.rotation.y += 0.01;
     // this.coin.rotation.z += 0.01;
+
     for (const enemy of this.enemies) {
       if (enemy.alive) {
         enemy.move();
