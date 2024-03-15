@@ -3,7 +3,7 @@ import * as THREE from "three";
 export class Enemy {
   constructor(hp, speed, currentField, enemyFinishedPath) {
     this.hp = hp;
-    this.speed = speed;
+    this.speed = 1;
     this.currentField = currentField;
     this.nextField = currentField.getRandomNextField();
     this.enemyFinishedPath = enemyFinishedPath;

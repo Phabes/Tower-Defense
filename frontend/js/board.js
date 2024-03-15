@@ -46,17 +46,7 @@ export class Board {
 
   createBoard = () => {
     this.clearBoard();
-    this.boardGroup.position.set(
-      -(
-        this.level.map[0].length * settings.FIELD_SIZE +
-        (this.level.map[0].length - 1) * 2
-      ) / 2,
-      -(
-        this.level.map.length * settings.FIELD_SIZE +
-        (this.level.map.length - 1) * 2
-      ) / 2,
-      0
-    );
+    this.setGroupPosition(this.boardGroup);
 
     for (let i = 0; i < this.level.map.length; i++) {
       const row = [];
@@ -77,6 +67,20 @@ export class Board {
 
     this.setPath();
     this.animate();
+  };
+
+  setGroupPosition = (element) => {
+    element.position.set(
+      -(
+        this.level.map[0].length * settings.FIELD_SIZE +
+        (this.level.map[0].length - 1) * 2
+      ) / 2,
+      -(
+        this.level.map.length * settings.FIELD_SIZE +
+        (this.level.map.length - 1) * 2
+      ) / 2,
+      0
+    );
   };
 
   setPath = () => {
@@ -120,7 +124,8 @@ export class Board {
   };
 
   spawnEnemies = (numberOfEnemies) => {
-    this.boardGroup.add(this.enemiesGroup);
+    this.setGroupPosition(this.enemiesGroup);
+    this.game.scene.add(this.enemiesGroup);
 
     const startField = this.getRandomFirstField();
     for (let i = 0; i < numberOfEnemies; i++) {
