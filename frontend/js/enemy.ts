@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Field } from "./field";
 
-export class Enemy {
+export class Enemy extends THREE.Mesh {
   hp: number;
   speed: number;
   currentField: Field;
@@ -20,6 +20,7 @@ export class Enemy {
     currentField: Field,
     enemyFinishedPath: (e: Enemy) => void
   ) {
+    super();
     this.hp = hp;
     this.speed = speed;
     this.currentField = currentField;
@@ -38,41 +39,40 @@ export class Enemy {
   };
 
   spawn = () => {
-    const geometry = new THREE.SphereGeometry(50);
-    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-    this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.position.set(
+    this.geometry = new THREE.SphereGeometry(50);
+    this.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    this.position.set(
       this.currentField.position.x,
       this.currentField.position.y,
       this.currentField.position.z
     );
-    return this.mesh;
+    return this;
   };
 
   move = () => {
-    if (this.nextField == null) {
+    if (!this.nextField) {
       return;
     }
     const direction = new THREE.Vector3(
       this.nextField.coord.x - this.currentField.coord.x,
       -(this.nextField.coord.y - this.currentField.coord.y)
     );
-    this.mesh.position.add(direction.multiplyScalar(this.speed));
+    this.position.add(direction.multiplyScalar(this.speed));
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
       this.nextField = this.nextField.getRandomNextField();
-      if (this.nextField == null) {
+      if (!this.nextField) {
         this.enemyFinishedPath(this);
       }
     }
   };
 
   checkFieldChange = () => {
-    if (this.nextField == null) {
+    if (!this.nextField) {
       return false;
     }
     const distanceToEnemy = this.currentField.position.distanceTo(
-      this.mesh.position
+      this.position
     );
     const distanceToNextField = this.currentField.position.distanceTo(
       this.nextField.position

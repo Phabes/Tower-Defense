@@ -38,7 +38,7 @@ export class Game {
     });
   };
 
-  levelCompleted = (level) => {
+  levelCompleted = (level: Level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
     this.player.levelCompleted();
@@ -48,7 +48,6 @@ export class Game {
   prepareGame = (index: number) => {
     this.board.setLevel(this.levels[index]);
     this.board.createBoard();
-    this.panel.clearPanel();
     // this.board.createPlayerStats();
     this.camera.setCamera();
     this.renderer.renderGame();

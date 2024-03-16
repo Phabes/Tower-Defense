@@ -1,6 +1,7 @@
 import $ from "jquery";
 import { Game } from "./game";
 import { Player } from "./player";
+import { Field } from "./field";
 
 export class Panel {
   game: Game;
@@ -8,13 +9,27 @@ export class Panel {
     this.game = game;
   }
 
-  clearPanel = () => {
-    $("#panel").empty();
+  clearLevel = () => {
+    $("#level").empty();
+  };
+
+  clearTimer = () => {
+    $("#timer").empty();
+  };
+
+  clearPlayer = () => {
+    $("#player").empty();
+  };
+
+  clearAction = () => {
+    $("#action").empty();
   };
 
   showSelectLevel = () => {
-    this.clearPanel();
-    const panel = $("#panel");
+    this.clearLevel();
+    this.clearPlayer();
+    this.clearAction();
+    const levelElement = $("#level");
     const select = $("<select>").attr("id", "levelSelect");
     const values: string[] = [];
 
@@ -35,26 +50,27 @@ export class Panel {
       values.push(level.toString());
       select.append(option);
     }
-    panel.append(select);
+    levelElement.append(select);
     const button = $("<button>")
       .text("START")
       .on("click", () => {
         const value = $("#levelSelect").val();
         const index = values.indexOf(value!.toString());
+        this.clearLevel();
         this.game.prepareGame(index);
       });
-    panel.append(button);
+    levelElement.append(button);
     // button.trigger("click"); // to delete
   };
 
   setTimer = (time: number) => {
-    this.clearPanel();
-    const timer = $("<div>").text(time--);
-    $("#panel").append(timer);
+    this.clearTimer();
+    const timer = $("#timer");
+    timer.text(time--);
     const interval = setInterval(() => {
       if (time == 0) {
         clearInterval(interval);
-        this.clearPanel();
+        this.clearTimer();
         this.game.startRound();
         return;
       }
@@ -63,11 +79,17 @@ export class Panel {
   };
 
   showPlayerStats = (player: Player) => {
-    this.clearPanel();
-    const panel = $("#panel");
-    const hp = $("<div>").text(player.hp);
-    const money = $("<div>").text(player.money);
-    panel.append(hp);
-    panel.append(money);
+    this.clearPlayer();
+    const playerElement = $("#player");
+    playerElement.append(`hp: ${player.hp}, money: ${player.money}`);
+  };
+
+  fieldChange = (field: Field | null) => {
+    if (!field) {
+      this.clearAction();
+      return;
+    }
+    const action = $("#action");
+    action.text(`y: ${field.coord.y}, x: ${field.coord.x}`);
   };
 }

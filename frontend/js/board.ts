@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Enemy } from "./enemy";
 import { settings } from "./settings";
 import { Field } from "./field";
-import { boardClick, getBoardElement } from "./ui";
+import { boardClick, boardOffClick, getBoardElement } from "./ui";
 import { Game } from "./game";
 import { Coord, Level } from "./types";
 
@@ -16,6 +16,7 @@ export class Board {
   level: Level;
   round: number;
   animations: number;
+  selectedField: Field | null;
   heart: THREE.Mesh<
     THREE.ExtrudeGeometry,
     THREE.MeshBasicMaterial,
@@ -33,7 +34,7 @@ export class Board {
     this.boardGroup = new THREE.Group();
     this.enemiesGroup = new THREE.Group();
     this.raycaster = new THREE.Raycaster();
-    boardClick(this.click);
+    this.selectedField = null;
   }
 
   click = (event: JQuery.ClickEvent) => {
@@ -47,11 +48,26 @@ export class Board {
       this.boardGroup.children
     );
     if (intersects.length > 0) {
-      console.log(intersects);
       for (let i = 0; i < intersects.length; i++) {
-        // intersects[i].object.material.color.set(0xff0000);
+        const object = intersects[i].object;
+        if (object instanceof Field) {
+          if (this.selectedField) {
+            this.selectedField.material = new THREE.MeshBasicMaterial({
+              color: 0xff0000,
+            });
+          }
+          if (object.type == "building") {
+            object.material = new THREE.MeshBasicMaterial({
+              color: 0xff00ff,
+            });
+            this.selectedField = object;
+          } else {
+            this.selectedField = null;
+          }
+        }
       }
     }
+    this.game.panel.fieldChange(this.selectedField);
   };
 
   setLevel = (level: Level) => {
@@ -69,23 +85,21 @@ export class Board {
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
 
+    const mapSizeY = this.level.map.length;
     for (let i = 0; i < this.level.map.length; i++) {
       const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
-        const field = new Field(
-          coord,
-          this.level.map[i][j].type,
-          this.level.map.length
-        );
+        const field = new Field(coord, this.level.map[i][j].type);
         row.push(field);
-        this.boardGroup.add(field.createField());
+        this.boardGroup.add(field.createField(mapSizeY));
       }
       this.fields.push(row);
     }
     this.game.scene.add(this.boardGroup);
 
     this.setPath();
+    boardClick(this.click);
     this.animate();
   };
 
@@ -172,10 +186,11 @@ export class Board {
     this.enemies[index].setAlive(false);
     this.enemies[index].setActive(false);
     // this.enemies.splice(index, 1);
-    this.enemiesGroup.remove(enemy.mesh);
+    this.enemiesGroup.remove(enemy);
     this.game.player.takeDamage(1);
     this.game.panel.showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
+      boardOffClick();
       cancelAnimationFrame(this.animations);
       return;
     }
@@ -183,7 +198,7 @@ export class Board {
     if (activeEnemies == 0) {
       const nextRound = this.round + 1;
       if (nextRound >= this.level.waves.length) {
-        console.log("level completed");
+        boardOffClick();
         cancelAnimationFrame(this.animations);
         this.game.levelCompleted(this.level);
         return;

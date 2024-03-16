@@ -18,3 +18,7 @@ export const windowResize = (camera: Camera, renderer: Renderer) => {
 export const boardClick = (callback: any) => {
   getBoardElement().on("click", callback);
 };
+
+export const boardOffClick = () => {
+  getBoardElement().off("click");
+};

@@ -1,1 +1,1 @@
-export type Surface = "grass" | "path";
+export type Surface = "grass" | "path" | "building";
