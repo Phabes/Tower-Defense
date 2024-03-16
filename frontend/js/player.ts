@@ -5,6 +5,7 @@ export class Player {
   maxHP: number;
   money: number;
   level: number;
+
   constructor(hp: number, money: number) {
     this.hp = hp;
     this.maxHP = hp;
