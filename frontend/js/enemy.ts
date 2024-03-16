@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Field } from "./field";
+import { Field } from "./fields/field";
 
 export class Enemy extends THREE.Mesh {
   hp: number;
@@ -14,6 +14,7 @@ export class Enemy extends THREE.Mesh {
     THREE.MeshBasicMaterial,
     THREE.Object3DEventMap
   >;
+
   constructor(
     hp: number,
     speed: number,

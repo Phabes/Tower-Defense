@@ -1,10 +1,18 @@
 import * as THREE from "three";
-import { Enemy } from "./enemy";
 import { settings } from "./settings";
-import { Field } from "./field";
-import { boardClick, boardOffClick, getBoardElement } from "./ui";
+import { Enemy } from "./enemy";
+import { Field } from "./fields/field";
 import { Game } from "./game";
 import { Coord, Level } from "./types";
+import { Building } from "./fields/building";
+import { Path } from "./fields/path";
+import {
+  boardClick,
+  boardOffClick,
+  getBoardElement,
+  setTimer,
+  showPlayerStats,
+} from "./ui";
 
 export class Board {
   game: Game;
@@ -27,6 +35,7 @@ export class Board {
     THREE.MeshBasicMaterial,
     THREE.Object3DEventMap
   >;
+
   constructor(game: Game) {
     this.game = game;
     this.fields = [];
@@ -50,24 +59,19 @@ export class Board {
     if (intersects.length > 0) {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
-        if (object instanceof Field) {
-          if (this.selectedField) {
-            this.selectedField.material = new THREE.MeshBasicMaterial({
-              color: 0xff0000,
-            });
-          }
-          if (object.type == "building") {
-            object.material = new THREE.MeshBasicMaterial({
-              color: 0xff00ff,
-            });
-            this.selectedField = object;
-          } else {
-            this.selectedField = null;
-          }
+        if (this.selectedField) {
+          this.selectedField.colorField(false);
+          this.selectedField.showPanel(false, this.game.player);
+        }
+        if (object instanceof Building) {
+          this.selectedField = object;
+          this.selectedField.colorField(true);
+          this.selectedField.showPanel(true, this.game.player);
+        } else {
+          this.selectedField = null;
         }
       }
     }
-    this.game.panel.fieldChange(this.selectedField);
   };
 
   setLevel = (level: Level) => {
@@ -90,7 +94,12 @@ export class Board {
       const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
-        const field = new Field(coord, this.level.map[i][j].type);
+        const field =
+          this.level.map[i][j].type == "building"
+            ? new Building(coord, this.level.map[i][j].type)
+            : this.level.map[i][j].type == "path"
+            ? new Path(coord, this.level.map[i][j].type)
+            : new Field(coord, this.level.map[i][j].type);
         row.push(field);
         this.boardGroup.add(field.createField(mapSizeY));
       }
@@ -148,13 +157,13 @@ export class Board {
 
   prepareRound = (round: number) => {
     this.round = round;
-    this.game.panel.setTimer(this.level.waves[this.round].timer);
+    setTimer(this.level.waves[this.round].timer, this.startRound);
   };
 
   startRound = () => {
     this.enemies = [];
     this.spawnEnemies(this.level.waves[this.round].enemies);
-    this.game.panel.showPlayerStats(this.game.player);
+    showPlayerStats(this.game.player);
   };
 
   spawnEnemies = (numberOfEnemies: number) => {
@@ -188,7 +197,7 @@ export class Board {
     // this.enemies.splice(index, 1);
     this.enemiesGroup.remove(enemy);
     this.game.player.takeDamage(1);
-    this.game.panel.showPlayerStats(this.game.player);
+    showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
       boardOffClick();
       cancelAnimationFrame(this.animations);
