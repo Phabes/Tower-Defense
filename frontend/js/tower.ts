@@ -1,48 +1,35 @@
 import * as THREE from "three";
 import { settings } from "./settings";
 import { Building } from "./fields/building";
+import { Upgrade } from "./upgrade";
 
 export class Tower extends THREE.Mesh {
   building: Building;
-  range: number;
-  power: number;
-  speed: number;
+  active: boolean;
+  range: Upgrade;
+  power: Upgrade;
+  speed: Upgrade;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
     super();
     this.building = building;
-    this.range = 0;
-    this.power = 0;
-    this.speed = 0;
+    this.active = false;
+    this.range = new Upgrade(2, 0, 300, 1, this.rebuildTower);
+    this.power = new Upgrade(2, 0, 250, 50, this.rebuildTower);
+    this.speed = new Upgrade(2, 0, 200, 20, this.rebuildTower);
     this.upgradeBuilding = upgradeBuilding;
     this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }
 
-  upgradeRange = () => {
-    this.range++;
-    this.rebuildTower();
-  };
-
-  upgradePower = () => {
-    this.power++;
-    this.rebuildTower();
-  };
-
-  upgradeSpeed = () => {
-    this.speed++;
-    this.rebuildTower();
-  };
-
   rebuildTower = () => {
+    this.active = true;
     this.upgradeTower();
     this.upgradeBuilding();
   };
 
   upgradeTower = () => {
-    this.range += 10; // to delete
-    const height =
-      settings.TOWER_DEFAULT_SIZE + this.range + this.power + this.speed;
+    const height = settings.TOWER_DEFAULT_SIZE;
 
     this.geometry = new THREE.BoxGeometry(
       settings.TOWER_DEFAULT_SIZE,

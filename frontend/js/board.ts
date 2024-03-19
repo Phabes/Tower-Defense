@@ -157,6 +157,7 @@ export class Board {
 
   prepareRound = (round: number) => {
     this.round = round;
+    showPlayerStats(this.game.player);
     setTimer(this.level.waves[this.round].timer, this.startRound);
   };
 
