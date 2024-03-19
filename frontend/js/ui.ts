@@ -3,6 +3,7 @@ import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Tower } from "./tower";
 import { Player } from "./player";
+import { Upgrade } from "./upgrade";
 
 export const getBoardElement = () => {
   return $("#board");
@@ -99,33 +100,43 @@ export const setTimer = (time: number, startRound: () => void) => {
 export const showPlayerStats = (player: Player) => {
   clearPlayer();
   const playerElement = $("#player");
-  playerElement.append(`hp: ${player.hp}, money: ${player.money}`);
+  playerElement.text(`hp: ${player.hp}, money: ${player.money}`);
 };
 
 export const showTowerPanel = (tower: Tower | null, player: Player) => {
+  clearAction();
+  showPlayerStats(player);
   if (!tower) {
-    clearAction();
     return;
   }
+
   const action = $("#action");
   action.text(`y: ${tower.building.coord.y}, x: ${tower.building.coord.x}`);
+
   const range = $("<button>")
-    .text("UPGRADE RANGE")
-    .on("click", () => {
-      tower.upgradeRange();
-    });
+    .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
+    .on("click", () => upgradeClick(tower, tower.range, player))
+    .prop("disabled", !player.canBuy(tower.range.nextUpgradeCost));
+
   const power = $("<button>")
-    .text("UPGRADE POWER")
-    .on("click", () => {
-      tower.upgradePower();
-    });
+    .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
+    .on("click", () => upgradeClick(tower, tower.power, player))
+    .prop("disabled", !player.canBuy(tower.power.nextUpgradeCost));
+
   const speed = $("<button>")
-    .text("UPGRADE SPEED")
-    .on("click", () => {
-      tower.upgradeSpeed();
-    });
+    .text(tower.speed.canLevelUp() ? "UPGRADE SPEED" : "MAX SPEED REACHED")
+    .on("click", () => upgradeClick(tower, tower.speed, player))
+    .prop("disabled", !player.canBuy(tower.speed.nextUpgradeCost));
+
   action.append(range);
   action.append(power);
   action.append(speed);
-  // check money
+};
+
+const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
+  if (player.canBuy(upgrade.nextUpgradeCost)) {
+    player.substractMoney(upgrade.nextUpgradeCost);
+    upgrade.levelUp();
+    showTowerPanel(tower, player);
+  }
 };

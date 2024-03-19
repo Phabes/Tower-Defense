@@ -29,6 +29,10 @@ export class Player {
     this.money -= money;
   };
 
+  canBuy = (money: number) => {
+    return this.money >= money;
+  };
+
   changePlayerLevel = (level: number) => {
     if (level > this.level) {
       this.level = level;
