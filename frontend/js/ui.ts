@@ -116,17 +116,17 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
   const range = $("<button>")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))
-    .prop("disabled", player.money < tower.range.nextUpgradeCost);
+    .prop("disabled", !player.canBuy(tower.range.nextUpgradeCost));
 
   const power = $("<button>")
     .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
     .on("click", () => upgradeClick(tower, tower.power, player))
-    .prop("disabled", player.money < tower.power.nextUpgradeCost);
+    .prop("disabled", !player.canBuy(tower.power.nextUpgradeCost));
 
   const speed = $("<button>")
     .text(tower.speed.canLevelUp() ? "UPGRADE SPEED" : "MAX SPEED REACHED")
     .on("click", () => upgradeClick(tower, tower.speed, player))
-    .prop("disabled", player.money < tower.speed.nextUpgradeCost);
+    .prop("disabled", !player.canBuy(tower.speed.nextUpgradeCost));
 
   action.append(range);
   action.append(power);

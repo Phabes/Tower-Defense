@@ -195,7 +195,6 @@ export class Board {
     const index = this.enemies.indexOf(enemy);
     this.enemies[index].setAlive(false);
     this.enemies[index].setActive(false);
-    // this.enemies.splice(index, 1);
     this.enemiesGroup.remove(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
