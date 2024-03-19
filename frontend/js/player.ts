@@ -5,6 +5,7 @@ export class Player {
   maxHP: number;
   money: number;
   level: number;
+
   constructor(hp: number, money: number) {
     this.hp = hp;
     this.maxHP = hp;
@@ -26,6 +27,10 @@ export class Player {
 
   substractMoney = (money: number) => {
     this.money -= money;
+  };
+
+  canBuy = (money: number) => {
+    return this.money >= money;
   };
 
   changePlayerLevel = (level: number) => {

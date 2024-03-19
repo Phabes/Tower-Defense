@@ -1,6 +1,7 @@
 import { Coord } from "./coord";
+import { Surface } from "./surface";
 
 export type Square = {
-  type: "grass" | "path";
+  type: Surface;
   nextCoords?: Coord[];
 };

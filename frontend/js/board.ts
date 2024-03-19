@@ -1,10 +1,18 @@
 import * as THREE from "three";
-import { Enemy } from "./enemy";
 import { settings } from "./settings";
-import { Field } from "./field";
-import { boardClick, getBoardElement } from "./ui";
+import { Enemy } from "./enemy";
+import { Field } from "./fields/field";
 import { Game } from "./game";
 import { Coord, Level } from "./types";
+import { Building } from "./fields/building";
+import { Path } from "./fields/path";
+import {
+  boardClick,
+  boardOffClick,
+  getBoardElement,
+  setTimer,
+  showPlayerStats,
+} from "./ui";
 
 export class Board {
   game: Game;
@@ -16,6 +24,7 @@ export class Board {
   level: Level;
   round: number;
   animations: number;
+  selectedField: Field | null;
   heart: THREE.Mesh<
     THREE.ExtrudeGeometry,
     THREE.MeshBasicMaterial,
@@ -26,6 +35,7 @@ export class Board {
     THREE.MeshBasicMaterial,
     THREE.Object3DEventMap
   >;
+
   constructor(game: Game) {
     this.game = game;
     this.fields = [];
@@ -33,7 +43,7 @@ export class Board {
     this.boardGroup = new THREE.Group();
     this.enemiesGroup = new THREE.Group();
     this.raycaster = new THREE.Raycaster();
-    boardClick(this.click);
+    this.selectedField = null;
   }
 
   click = (event: JQuery.ClickEvent) => {
@@ -47,9 +57,19 @@ export class Board {
       this.boardGroup.children
     );
     if (intersects.length > 0) {
-      console.log(intersects);
       for (let i = 0; i < intersects.length; i++) {
-        // intersects[i].object.material.color.set(0xff0000);
+        const object = intersects[i].object;
+        if (this.selectedField) {
+          this.selectedField.colorField(false);
+          this.selectedField.showPanel(false, this.game.player);
+        }
+        if (object instanceof Building) {
+          this.selectedField = object;
+          this.selectedField.colorField(true);
+          this.selectedField.showPanel(true, this.game.player);
+        } else {
+          this.selectedField = null;
+        }
       }
     }
   };
@@ -69,23 +89,26 @@ export class Board {
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
 
+    const mapSizeY = this.level.map.length;
     for (let i = 0; i < this.level.map.length; i++) {
       const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
-        const field = new Field(
-          coord,
-          this.level.map[i][j].type,
-          this.level.map.length
-        );
+        const field =
+          this.level.map[i][j].type == "building"
+            ? new Building(coord, this.level.map[i][j].type)
+            : this.level.map[i][j].type == "path"
+            ? new Path(coord, this.level.map[i][j].type)
+            : new Field(coord, this.level.map[i][j].type);
         row.push(field);
-        this.boardGroup.add(field.createField());
+        this.boardGroup.add(field.createField(mapSizeY));
       }
       this.fields.push(row);
     }
     this.game.scene.add(this.boardGroup);
 
     this.setPath();
+    boardClick(this.click);
     this.animate();
   };
 
@@ -134,13 +157,14 @@ export class Board {
 
   prepareRound = (round: number) => {
     this.round = round;
-    this.game.panel.setTimer(this.level.waves[this.round].timer);
+    showPlayerStats(this.game.player);
+    setTimer(this.level.waves[this.round].timer, this.startRound);
   };
 
   startRound = () => {
     this.enemies = [];
     this.spawnEnemies(this.level.waves[this.round].enemies);
-    this.game.panel.showPlayerStats(this.game.player);
+    showPlayerStats(this.game.player);
   };
 
   spawnEnemies = (numberOfEnemies: number) => {
@@ -171,11 +195,11 @@ export class Board {
     const index = this.enemies.indexOf(enemy);
     this.enemies[index].setAlive(false);
     this.enemies[index].setActive(false);
-    // this.enemies.splice(index, 1);
-    this.enemiesGroup.remove(enemy.mesh);
+    this.enemiesGroup.remove(enemy);
     this.game.player.takeDamage(1);
-    this.game.panel.showPlayerStats(this.game.player);
+    showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
+      boardOffClick();
       cancelAnimationFrame(this.animations);
       return;
     }
@@ -183,7 +207,7 @@ export class Board {
     if (activeEnemies == 0) {
       const nextRound = this.round + 1;
       if (nextRound >= this.level.waves.length) {
-        console.log("level completed");
+        boardOffClick();
         cancelAnimationFrame(this.animations);
         this.game.levelCompleted(this.level);
         return;

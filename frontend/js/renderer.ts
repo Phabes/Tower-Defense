@@ -5,6 +5,7 @@ import { Camera } from "./camera";
 export class Renderer extends THREE.WebGLRenderer {
   scene: THREE.Scene;
   camera: Camera;
+
   constructor(scene: THREE.Scene, camera: Camera) {
     super();
     this.scene = scene;
