@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
+import { settings } from "./settings";
 
 export class Enemy extends THREE.Mesh {
   hp: number;
@@ -40,7 +41,7 @@ export class Enemy extends THREE.Mesh {
   };
 
   spawn = () => {
-    this.geometry = new THREE.SphereGeometry(50);
+    this.geometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
     this.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     this.position.set(
       this.currentField.position.x,
@@ -54,11 +55,11 @@ export class Enemy extends THREE.Mesh {
     if (!this.nextField) {
       return;
     }
-    const direction = new THREE.Vector3(
-      this.nextField.coord.x - this.currentField.coord.x,
-      -(this.nextField.coord.y - this.currentField.coord.y)
-    );
-    this.position.add(direction.multiplyScalar(this.speed));
+    const moveVector = this.nextField.position
+      .clone()
+      .sub(this.currentField.position)
+      .normalize();
+    this.translateOnAxis(moveVector, this.speed);
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
       this.nextField = this.nextField.getRandomNextField();
