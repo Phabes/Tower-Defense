@@ -164,6 +164,7 @@ export class Board {
   };
 
   prepareRound = (round: number) => {
+    console.log("R");
     this.round = round;
     showPlayerStats(this.game.player);
     setTimer(this.level.waves[this.round].timer, this.startRound);
@@ -282,10 +283,10 @@ export class Board {
     }
 
     for (const tower of this.towers) {
-      if (tower.active) {
+      if (tower.active && !tower.shooting) {
         for (const enemy of this.enemies) {
           const targets: Enemy[] = [];
-          if (tower.inRange(enemy.position)) {
+          if (enemy.active && tower.inRange(enemy.position)) {
             targets.push(enemy);
           }
         }

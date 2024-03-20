@@ -10,6 +10,7 @@ export class Tower extends THREE.Mesh {
   range: Upgrade;
   power: Upgrade;
   speed: Upgrade;
+  shooting: boolean;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
@@ -26,6 +27,7 @@ export class Tower extends THREE.Mesh {
     );
     this.power = new Upgrade(2, 50, 250, 50, this.rebuildTower);
     this.speed = new Upgrade(2, 20, 200, 20, this.rebuildTower);
+    this.shooting = false;
     this.upgradeBuilding = upgradeBuilding;
     this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }
@@ -55,8 +57,18 @@ export class Tower extends THREE.Mesh {
     );
   };
 
-  inRange = (objectPosition: THREE.Vector3) => {
-    const distanceBetween = this.building.position.distanceTo(objectPosition);
+  inRange = (objectPosition3d: THREE.Vector3) => {
+    const towerPosition = new THREE.Vector3(
+      this.building.position.x,
+      this.building.position.y,
+      0
+    );
+    const objectPosition2d = new THREE.Vector3(
+      objectPosition3d.x,
+      objectPosition3d.y,
+      0
+    );
+    const distanceBetween = towerPosition.distanceTo(objectPosition2d);
     const distanceRange =
       this.range.value * settings.FIELD_SIZE + settings.FIELD_SIZE / 2;
     return distanceBetween <= distanceRange;
