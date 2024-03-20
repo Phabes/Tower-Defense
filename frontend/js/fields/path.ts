@@ -9,7 +9,7 @@ export class Path extends Field {
 
   colorField = (selected: boolean) => {
     this.material = new THREE.MeshBasicMaterial({
-      color: selected ? 0xff00ff : 0xffff00,
+      color: selected ? 0xff00ff : 0xedea3e,
     });
   };
 }
