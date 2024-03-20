@@ -113,6 +113,15 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
   const action = $("#action");
   action.text(`y: ${tower.building.coord.y}, x: ${tower.building.coord.x}`);
 
+  if (!tower.active) {
+    const activate = $("<button>")
+      .text("ACTIVATE TOWER")
+      .on("click", () => upgradeClick(tower, tower.activeCost, player))
+      .prop("disabled", !player.canBuy(tower.activeCost.nextUpgradeCost));
+    action.append(activate);
+    return;
+  }
+
   const range = $("<button>")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))

@@ -13,11 +13,13 @@ import {
   setTimer,
   showPlayerStats,
 } from "./ui";
+import { Tower } from "./tower";
 
 export class Board {
   game: Game;
   fields: Field[][];
   enemies: Enemy[];
+  towers: Tower[];
   boardGroup: THREE.Group<THREE.Object3DEventMap>;
   enemiesGroup: THREE.Group<THREE.Object3DEventMap>;
   raycaster: THREE.Raycaster;
@@ -40,6 +42,7 @@ export class Board {
     this.game = game;
     this.fields = [];
     this.enemies = [];
+    this.towers = [];
     this.boardGroup = new THREE.Group();
     this.enemiesGroup = new THREE.Group();
     this.raycaster = new THREE.Raycaster();
@@ -94,12 +97,17 @@ export class Board {
       const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
+        const fieldType = this.level.map[i][j].type;
         const field =
-          this.level.map[i][j].type == "building"
-            ? new Building(coord, this.level.map[i][j].type)
-            : this.level.map[i][j].type == "path"
-            ? new Path(coord, this.level.map[i][j].type)
-            : new Field(coord, this.level.map[i][j].type);
+          fieldType == "building"
+            ? new Building(coord, fieldType)
+            : fieldType == "path"
+            ? new Path(coord, fieldType)
+            : new Field(coord, fieldType);
+        if (fieldType == "building") {
+          const building = field as Building;
+          this.towers.push(building.tower);
+        }
         row.push(field);
         this.boardGroup.add(field.createField(mapSizeY));
       }
@@ -270,6 +278,17 @@ export class Board {
     for (const enemy of this.enemies) {
       if (enemy.alive) {
         enemy.move();
+      }
+    }
+
+    for (const tower of this.towers) {
+      if (tower.active) {
+        for (const enemy of this.enemies) {
+          const targets: Enemy[] = [];
+          if (tower.inRange(enemy.position)) {
+            targets.push(enemy);
+          }
+        }
       }
     }
 

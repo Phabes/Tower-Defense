@@ -31,7 +31,6 @@ export class Field extends THREE.Mesh implements FieldInterface {
   showPanel = (show: boolean, player: Player) => {};
 
   addFieldElement = (element: THREE.Mesh) => {
-    console.log(this.elementsOnField);
     element.position.set(this.position.x, this.position.y, element.position.z);
     this.elementsOnField.add(element);
   };
