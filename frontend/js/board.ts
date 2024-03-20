@@ -27,16 +27,16 @@ export class Board {
   round: number;
   animations: number;
   selectedField: Field | null;
-  heart: THREE.Mesh<
-    THREE.ExtrudeGeometry,
-    THREE.MeshBasicMaterial,
-    THREE.Object3DEventMap
-  >;
-  coin: THREE.Mesh<
-    THREE.CylinderGeometry,
-    THREE.MeshBasicMaterial,
-    THREE.Object3DEventMap
-  >;
+  // heart: THREE.Mesh<
+  //   THREE.ExtrudeGeometry,
+  //   THREE.MeshBasicMaterial,
+  //   THREE.Object3DEventMap
+  // >;
+  // coin: THREE.Mesh<
+  //   THREE.CylinderGeometry,
+  //   THREE.MeshBasicMaterial,
+  //   THREE.Object3DEventMap
+  // >;
 
   constructor(game: Game) {
     this.game = game;
@@ -181,7 +181,13 @@ export class Board {
 
     const startField = this.getRandomFirstField();
     for (let i = 0; i < numberOfEnemies; i++) {
-      const enemy = new Enemy(100, 10, startField, this.enemyFinishedPath);
+      const enemy = new Enemy(
+        settings.ENEMY_HP,
+        settings.ENEMY_SPEED,
+        settings.ENEMY_MONEY,
+        startField,
+        this.enemyFinishedPath
+      );
       this.enemies.push(enemy);
     }
 
@@ -220,6 +226,11 @@ export class Board {
 
   enemyDied = (enemy: Enemy) => {
     this.removeEnemy(enemy);
+    this.game.player.addMoney(enemy.money);
+    showPlayerStats(this.game.player);
+    if (this.selectedField) {
+      this.selectedField.showPanel(true, this.game.player);
+    }
     this.checkFinishRound();
   };
 
@@ -242,51 +253,6 @@ export class Board {
     for (const tower of this.towers) {
       tower.deactivate();
     }
-  };
-
-  createPlayerStats = () => {
-    this.createHeart();
-    this.createCoin();
-    this.animate();
-  };
-
-  createHeart = () => {
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 0, -5, -25, -25, -25);
-    heartShape.bezierCurveTo(-55, -25, -55, 10, -55, 10);
-    heartShape.bezierCurveTo(-55, 30, -35, 52, 0, 70);
-    heartShape.bezierCurveTo(35, 52, 55, 30, 55, 10);
-    heartShape.bezierCurveTo(55, 10, 55, -25, 25, -25);
-    heartShape.bezierCurveTo(10, -25, 0, 0, 0, 0);
-
-    const extrudeSettings = {
-      depth: 8,
-      bevelEnabled: true,
-      bevelSegments: 2,
-      steps: 2,
-      bevelSize: 1,
-      bevelThickness: 1,
-    };
-
-    const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
-    this.heart = new THREE.Mesh(
-      geometry,
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    );
-    this.heart.position.set(-200, 400, 100);
-    this.heart.rotation.z = Math.PI;
-    this.heart.rotation.x = Math.PI / 2;
-
-    this.game.scene.add(this.heart);
-  };
-
-  createCoin = () => {
-    const geometry = new THREE.CylinderGeometry(45, 45, 10, 32);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    this.coin = new THREE.Mesh(geometry, material);
-    this.coin.position.set(200, 400, 100);
-    this.game.scene.add(this.coin);
   };
 
   animate = () => {
@@ -327,4 +293,49 @@ export class Board {
 
     this.game.renderer.renderGame();
   };
+
+  // createPlayerStats = () => {
+  //   this.createHeart();
+  //   this.createCoin();
+  //   this.animate();
+  // };
+
+  // createHeart = () => {
+  //   const heartShape = new THREE.Shape();
+  //   heartShape.moveTo(0, 0);
+  //   heartShape.bezierCurveTo(0, 0, -5, -25, -25, -25);
+  //   heartShape.bezierCurveTo(-55, -25, -55, 10, -55, 10);
+  //   heartShape.bezierCurveTo(-55, 30, -35, 52, 0, 70);
+  //   heartShape.bezierCurveTo(35, 52, 55, 30, 55, 10);
+  //   heartShape.bezierCurveTo(55, 10, 55, -25, 25, -25);
+  //   heartShape.bezierCurveTo(10, -25, 0, 0, 0, 0);
+
+  //   const extrudeSettings = {
+  //     depth: 8,
+  //     bevelEnabled: true,
+  //     bevelSegments: 2,
+  //     steps: 2,
+  //     bevelSize: 1,
+  //     bevelThickness: 1,
+  //   };
+
+  //   const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+  //   this.heart = new THREE.Mesh(
+  //     geometry,
+  //     new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  //   );
+  //   this.heart.position.set(-200, 400, 100);
+  //   this.heart.rotation.z = Math.PI;
+  //   this.heart.rotation.x = Math.PI / 2;
+
+  //   this.game.scene.add(this.heart);
+  // };
+
+  // createCoin = () => {
+  //   const geometry = new THREE.CylinderGeometry(45, 45, 10, 32);
+  //   const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  //   this.coin = new THREE.Mesh(geometry, material);
+  //   this.coin.position.set(200, 400, 100);
+  //   this.game.scene.add(this.coin);
+  // };
 }
