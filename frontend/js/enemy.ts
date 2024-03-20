@@ -81,4 +81,9 @@ export class Enemy extends THREE.Mesh {
     );
     return distanceToEnemy >= distanceToNextField;
   };
+
+  takeDamage = (damage: number) => {
+    this.hp -= damage;
+    return this.hp > 0;
+  };
 }

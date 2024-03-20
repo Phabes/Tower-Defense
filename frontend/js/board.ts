@@ -199,11 +199,15 @@ export class Board {
     }, 1000);
   };
 
-  enemyFinishedPath = (enemy: Enemy) => {
+  removeEnemy = (enemy: Enemy) => {
     const index = this.enemies.indexOf(enemy);
     this.enemies[index].setAlive(false);
     this.enemies[index].setActive(false);
     this.enemiesGroup.remove(enemy);
+  };
+
+  enemyFinishedPath = (enemy: Enemy) => {
+    this.removeEnemy(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
@@ -211,6 +215,15 @@ export class Board {
       cancelAnimationFrame(this.animations);
       return;
     }
+    this.checkFinishRound();
+  };
+
+  enemyDied = (enemy: Enemy) => {
+    this.removeEnemy(enemy);
+    this.checkFinishRound();
+  };
+
+  checkFinishRound = () => {
     const activeEnemies = this.enemies.filter((e) => e.active).length;
     if (activeEnemies == 0) {
       const nextRound = this.round + 1;
@@ -294,13 +307,17 @@ export class Board {
         for (const bullet of tower.bullets) {
           bullet.move(tower.building.position);
           if (bullet.checkCollision(tower.building.position)) {
+            const enemyStillAlive = bullet.hitTarget();
+            if (!enemyStillAlive) {
+              this.enemyDied(bullet.target);
+            }
             tower.removeBullet(bullet);
           }
         }
 
         const targets: Enemy[] = [];
         for (const enemy of this.enemies) {
-          if (enemy.active && tower.inRange(enemy.position)) {
+          if (enemy.alive && tower.inRange(enemy.position)) {
             targets.push(enemy);
           }
         }

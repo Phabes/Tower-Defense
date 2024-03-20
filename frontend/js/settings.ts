@@ -4,6 +4,6 @@ export const settings = {
   SPACE_BETWEEN: 4,
   ENEMY_SIZE: 50,
   BULLET_SIZE: 20,
-  BULLET_SPEED: 4,
+  BULLET_SPEED: 8,
   COOKIE: "tower-defence",
 };
