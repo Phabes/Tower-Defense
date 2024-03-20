@@ -5,26 +5,24 @@ import { settings } from "./settings";
 export class Enemy extends THREE.Mesh {
   hp: number;
   speed: number;
+  money: number;
   currentField: Field;
   nextField: Field | null;
   enemyFinishedPath: (e: Enemy) => void;
   alive: boolean;
   active: boolean;
-  mesh: THREE.Mesh<
-    THREE.SphereGeometry,
-    THREE.MeshBasicMaterial,
-    THREE.Object3DEventMap
-  >;
 
   constructor(
     hp: number,
     speed: number,
+    money: number,
     currentField: Field,
     enemyFinishedPath: (e: Enemy) => void
   ) {
     super();
     this.hp = hp;
     this.speed = speed;
+    this.money = money;
     this.currentField = currentField;
     this.nextField = currentField.getRandomNextField();
     this.enemyFinishedPath = enemyFinishedPath;
@@ -80,5 +78,10 @@ export class Enemy extends THREE.Mesh {
       this.nextField.position
     );
     return distanceToEnemy >= distanceToNextField;
+  };
+
+  takeDamage = (damage: number) => {
+    this.hp -= damage;
+    return this.hp > 0;
   };
 }

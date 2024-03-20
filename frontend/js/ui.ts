@@ -125,21 +125,35 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
   const range = $("<button>")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))
-    .prop("disabled", !player.canBuy(tower.range.nextUpgradeCost));
+    .prop(
+      "disabled",
+      !player.canBuy(tower.range.nextUpgradeCost) || !tower.range.canLevelUp()
+    );
 
   const power = $("<button>")
     .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
     .on("click", () => upgradeClick(tower, tower.power, player))
-    .prop("disabled", !player.canBuy(tower.power.nextUpgradeCost));
+    .prop(
+      "disabled",
+      !player.canBuy(tower.power.nextUpgradeCost) || !tower.power.canLevelUp()
+    );
 
-  const speed = $("<button>")
-    .text(tower.speed.canLevelUp() ? "UPGRADE SPEED" : "MAX SPEED REACHED")
-    .on("click", () => upgradeClick(tower, tower.speed, player))
-    .prop("disabled", !player.canBuy(tower.speed.nextUpgradeCost));
+  const frequency = $("<button>")
+    .text(
+      tower.frequency.canLevelUp()
+        ? "UPGRADE FREQUENCY"
+        : "MAX FREQUENCY FREQUENCY"
+    )
+    .on("click", () => upgradeClick(tower, tower.frequency, player))
+    .prop(
+      "disabled",
+      !player.canBuy(tower.frequency.nextUpgradeCost) ||
+        !tower.frequency.canLevelUp()
+    );
 
   action.append(range);
   action.append(power);
-  action.append(speed);
+  action.append(frequency);
 };
 
 const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
