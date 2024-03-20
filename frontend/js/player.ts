@@ -4,17 +4,20 @@ export class Player {
   hp: number;
   maxHP: number;
   money: number;
+  startingMoney: number;
   level: number;
 
   constructor(hp: number, money: number) {
     this.hp = hp;
     this.maxHP = hp;
     this.money = money;
+    this.startingMoney = money;
     this.level = this.getPlayerLevel();
   }
 
   levelCompleted = () => {
     this.hp = this.maxHP;
+    this.money = this.startingMoney;
   };
 
   takeDamage = (damage: number) => {
