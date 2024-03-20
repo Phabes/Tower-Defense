@@ -24,7 +24,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
 
   colorField = (selected: boolean) => {
     this.material = new THREE.MeshBasicMaterial({
-      color: selected ? 0xff00ff : 0x00ff00,
+      color: selected ? 0xff00ff : 0x26d46e,
     });
   };
 

@@ -164,7 +164,6 @@ export class Board {
   };
 
   prepareRound = (round: number) => {
-    console.log("R");
     this.round = round;
     showPlayerStats(this.game.player);
     setTimer(this.level.waves[this.round].timer, this.startRound);
@@ -218,10 +217,17 @@ export class Board {
       if (nextRound >= this.level.waves.length) {
         boardOffClick();
         cancelAnimationFrame(this.animations);
+        this.deactivateTowers();
         this.game.levelCompleted(this.level);
         return;
       }
       this.prepareRound(nextRound);
+    }
+  };
+
+  deactivateTowers = () => {
+    for (const tower of this.towers) {
+      tower.deactivate();
     }
   };
 
@@ -283,13 +289,22 @@ export class Board {
     }
 
     for (const tower of this.towers) {
-      if (tower.active && !tower.shooting) {
+      if (tower.active) {
+        tower.clearBullets();
+        for (const bullet of tower.bullets) {
+          bullet.move(tower.building.position);
+          if (bullet.checkCollision(tower.building.position)) {
+            tower.removeBullet(bullet);
+          }
+        }
+
+        const targets: Enemy[] = [];
         for (const enemy of this.enemies) {
-          const targets: Enemy[] = [];
           if (enemy.active && tower.inRange(enemy.position)) {
             targets.push(enemy);
           }
         }
+        tower.setTargets(targets);
       }
     }
 
