@@ -11,7 +11,7 @@ export class Tower extends THREE.Mesh {
   activeCost: Upgrade;
   range: Upgrade;
   power: Upgrade;
-  speed: Upgrade;
+  frequency: Upgrade;
   targets: Enemy[];
   bullets: Bullet[];
   shooting: number;
@@ -30,7 +30,7 @@ export class Tower extends THREE.Mesh {
       this.rebuildTower
     );
     this.power = new Upgrade(2, 50, 250, 50, this.rebuildTower);
-    this.speed = new Upgrade(2, 600, 200, -200, this.rebuildTower);
+    this.frequency = new Upgrade(1, 600, 200, -200, this.upgradeFrequency);
     this.targets = [];
     this.bullets = [];
     this.shooting = 0;
@@ -64,27 +64,31 @@ export class Tower extends THREE.Mesh {
       if (this.targets.length > 0) {
         this.shoot();
       }
-    }, this.speed.value);
+    }, this.frequency.value);
   };
 
   shoot = () => {
     const target = this.chooseTarget();
     const height = settings.TOWER_DEFAULT_SIZE;
     const positionZ = this.building.position.z + height / 2;
-    const bullet = new Bullet(target, positionZ);
+    const bullet = new Bullet(target, this.power.value, positionZ);
     this.add(bullet);
     this.bullets.push(bullet);
   };
 
-  rebuildTower = () => {
-    this.shootInterval();
-    this.upgradeTower();
-    this.upgradeBuilding();
-  };
-
   activate = () => {
     this.active = true;
+    this.upgradeFrequency();
+  };
+
+  upgradeFrequency = () => {
+    this.shootInterval();
     this.rebuildTower();
+  };
+
+  rebuildTower = () => {
+    this.upgradeTower();
+    this.upgradeBuilding();
   };
 
   deactivate = () => {
