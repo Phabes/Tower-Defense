@@ -9,16 +9,12 @@ export const getBoardElement = () => {
   return $("#board");
 };
 
-export const clearLevel = () => {
-  $("#level").empty();
-};
-
-export const clearPlayer = () => {
-  $("#player").empty();
-};
-
 export const clearAction = () => {
   $("#action").empty();
+};
+
+export const removeLoading = () => {
+  $("#loading").remove();
 };
 
 export const windowResize = (camera: Camera, renderer: Renderer) => {
@@ -100,14 +96,16 @@ export const setTimer = (time: number, startRound: () => void) => {
 };
 
 export const showPlayerStats = (player: Player) => {
-  clearPlayer();
-  const playerElement = $("#player");
-  playerElement.text(`hp: ${player.hp}, money: ${player.money}`);
+  // const playerElement = $("#player");
+  // playerElement.text(`hp: ${player.hp}, money: ${player.money}`);
+  const playerHP = $("#hpValue");
+  playerHP.text(player.hp);
+  const playerMoney = $("#moneyValue");
+  playerMoney.text(player.money);
 };
 
 export const showTowerPanel = (tower: Tower | null, player: Player) => {
   clearAction();
-  showPlayerStats(player);
   if (!tower) {
     return;
   }
@@ -164,4 +162,19 @@ const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
     upgrade.levelUp();
     showTowerPanel(tower, player);
   }
+};
+
+export const showAlert = (alertMessage: string, alertAction: () => void) => {
+  const alertElement = $("#alert");
+  const alertContent = $("#alertContent");
+  alertContent.text(alertMessage);
+
+  const button = $("#alertAccept");
+  button.off("click");
+  button.on("click", () => {
+    alertElement.css("display", "none");
+    alertAction();
+  });
+
+  alertElement.css("display", "flex");
 };

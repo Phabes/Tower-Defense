@@ -218,6 +218,7 @@ export class Board {
     showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
       this.stop();
+      this.game.createAlert("Game Over");
       return;
     }
     this.checkFinishRound();

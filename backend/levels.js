@@ -87,7 +87,7 @@ exports.levels = [
       ],
     ],
     waves: [
-      { timer: 2, enemies: 20 },
+      { timer: 2, enemies: 5 },
       // { timer: 9, enemies: 4 },
       // { timer: 8, enemies: 3 },
     ],

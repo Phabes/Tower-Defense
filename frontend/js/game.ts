@@ -4,6 +4,8 @@ import { Board } from "./board";
 import { Player } from "./player";
 import {
   refreshSelectOptions,
+  removeLoading,
+  showAlert,
   showSelectLevel,
   startButtonClick,
   windowResize,
@@ -26,7 +28,7 @@ export class Game {
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
-    this.player = new Player(20, 500);
+    this.player = new Player(5, 500);
     this.board = new Board(this);
 
     this.retrieveLevels();
@@ -42,6 +44,7 @@ export class Game {
     getLevels().done((res) => {
       const levels = res.levels;
       this.levels = levels;
+      removeLoading();
       this.refreshLevelsSelection();
       startButtonClick(this.prepareGame);
     });
@@ -64,5 +67,9 @@ export class Game {
 
   startRound = () => {
     this.board.startRound();
+  };
+
+  createAlert = (alertMessage: string) => {
+    showAlert(alertMessage, this.refreshLevelsSelection);
   };
 }

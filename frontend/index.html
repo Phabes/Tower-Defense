@@ -10,21 +10,39 @@
       <div id="board"></div>
       <div id="panel">
         <div id="mainInfo">
-          <div class="pieceInfo" id="player"></div>
+          <div class="pieceInfo" id="player">
+            <div class="playerInfo" id="hp">
+              <div class="playerIcon">
+                <img src="./assets/images/heart.png" alt="heart" />
+              </div>
+              <div id="hpValue"></div>
+            </div>
+            <div class="playerInfo" id="money">
+              <div class="playerIcon">
+                <img src="./assets/images/money.png" alt="money" />
+              </div>
+              <div id="moneyValue"></div>
+            </div>
+          </div>
           <div class="pieceInfo" id="action"></div>
           <div class="pieceInfo" id="messages"></div>
         </div>
-        <div id="level">
+        <div class="fullPanel" id="level">
           <div id="levelTitle">Choose Level:</div>
           <div id="levelChoiceContainer">
             <select name="levelSelect" id="levelSelect"></select>
-            <div id="startLevel">START</div>
+            <div class="gameButton" id="startLevel">START</div>
           </div>
         </div>
-        <div id="timer">
+        <div class="fullPanel" id="timer">
           <div id="timerTitle">Time remaining to start round:</div>
           <div id="timeElement"></div>
         </div>
+        <div class="fullPanel" id="alert">
+          <div id="alertContent"></div>
+          <div class="gameButton" id="alertAccept">OK</div>
+        </div>
+        <div class="fullPanel" id="loading"><span class="loader"></span></div>
       </div>
     </div>
     <script defer type="module" src="js/game.ts"></script>
