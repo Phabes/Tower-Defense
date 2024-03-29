@@ -13,10 +13,6 @@ export const clearLevel = () => {
   $("#level").empty();
 };
 
-export const clearTimer = () => {
-  $("#timer").empty();
-};
-
 export const clearPlayer = () => {
   $("#player").empty();
 };
@@ -51,9 +47,12 @@ export const showSelectLevel = (
   clearPlayer();
   clearAction();
   const levelElement = $("#level");
+  const title = $("<div>").attr("id", "levelTitle").text("Choose Level:");
+  levelElement.append(title);
   const select = $("<select>").attr("id", "levelSelect");
   const values: string[] = [];
 
+  const container = $("<div>").attr("id", "levelChoiceContainer");
   for (let level = 0; level < possibleLevels; level++) {
     const disabled = playerLevel < level ? "disabled" : "";
     const selected =
@@ -69,8 +68,9 @@ export const showSelectLevel = (
     values.push(level.toString());
     select.append(option);
   }
-  levelElement.append(select);
-  const button = $("<button>")
+  container.append(select);
+  const button = $("<div>")
+    .attr("id", "startLevel")
     .text("START")
     .on("click", () => {
       const value = $("#levelSelect").val();
@@ -78,22 +78,25 @@ export const showSelectLevel = (
       clearLevel();
       prepareGame(index);
     });
-  levelElement.append(button);
+  container.append(button);
+  levelElement.append(container);
   // button.trigger("click"); // to delete
 };
 
 export const setTimer = (time: number, startRound: () => void) => {
-  clearTimer();
   const timer = $("#timer");
-  timer.text(time--);
+  const timeElement = $("#timeElement");
+  timeElement.text(time--);
+  timer.css("display", "flex");
+
   const interval = setInterval(() => {
     if (time == 0) {
       clearInterval(interval);
-      clearTimer();
+      timer.css("display", "none");
       startRound();
       return;
     }
-    timer.text(time--);
+    timeElement.text(time--);
   }, 1000);
 };
 

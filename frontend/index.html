@@ -9,10 +9,18 @@
     <div id="game">
       <div id="board"></div>
       <div id="panel">
-        <div id="level"></div>
-        <div id="timer"></div>
         <div id="player"></div>
         <div id="action"></div>
+        <div id="level">
+          <div id="levelTitle">Choose Level:</div>
+          <div id="levelChoiceContainer">
+            <select name="levelSelect" id="levelSelect"></select>
+          </div>
+        </div>
+        <div id="timer">
+          <div id="timerTitle">Time remaining to start round:</div>
+          <div id="timeElement"></div>
+        </div>
       </div>
     </div>
     <script defer type="module" src="js/game.ts"></script>
