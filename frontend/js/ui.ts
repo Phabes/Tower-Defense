@@ -4,13 +4,17 @@ import { Renderer } from "./renderer";
 import { Tower } from "./tower";
 import { Player } from "./player";
 import { Upgrade } from "./upgrade";
+import { Variant } from "./types";
 
 export const getBoardElement = () => {
   return $("#board");
 };
 
-export const clearAction = () => {
-  $("#action").empty();
+export const clearFieldOptions = () => {
+  $("#fieldCoordsTitle").empty();
+  $("#coordY").empty();
+  $("#coordX").empty();
+  $("#fieldButtons").empty();
 };
 
 export const removeLoading = () => {
@@ -71,7 +75,7 @@ export const startButtonClick = (prepareGame: (index: number) => void) => {
 };
 
 export const showSelectLevel = () => {
-  clearAction();
+  clearFieldOptions();
   const levelElement = $("#level");
   levelElement.css("display", "flex");
   // const button = $("#startLevel"); // to delete
@@ -96,8 +100,6 @@ export const setTimer = (time: number, startRound: () => void) => {
 };
 
 export const showPlayerStats = (player: Player) => {
-  // const playerElement = $("#player");
-  // playerElement.text(`hp: ${player.hp}, money: ${player.money}`);
   const playerHP = $("#hpValue");
   playerHP.text(player.hp);
   const playerMoney = $("#moneyValue");
@@ -105,24 +107,32 @@ export const showPlayerStats = (player: Player) => {
 };
 
 export const showTowerPanel = (tower: Tower | null, player: Player) => {
-  clearAction();
+  clearFieldOptions();
   if (!tower) {
     return;
   }
 
-  const action = $("#action");
-  action.text(`y: ${tower.building.coord.y}, x: ${tower.building.coord.x}`);
+  const fieldCoordsTitle = $("#fieldCoordsTitle");
+  const coordY = $("#coordY");
+  const coordX = $("#coordX");
+  const fieldButtons = $("#fieldButtons");
+
+  fieldCoordsTitle.text("Coordinates:");
+  coordY.text("Y: " + tower.building.coord.y);
+  coordX.text("X: " + tower.building.coord.x);
 
   if (!tower.active) {
     const activate = $("<button>")
+      .addClass("gameButton")
       .text("ACTIVATE TOWER")
       .on("click", () => upgradeClick(tower, tower.activeCost, player))
       .prop("disabled", !player.canBuy(tower.activeCost.nextUpgradeCost));
-    action.append(activate);
+    fieldButtons.append(activate);
     return;
   }
 
   const range = $("<button>")
+    .addClass("gameButton")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))
     .prop(
@@ -131,6 +141,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
     );
 
   const power = $("<button>")
+    .addClass("gameButton")
     .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
     .on("click", () => upgradeClick(tower, tower.power, player))
     .prop(
@@ -139,6 +150,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
     );
 
   const frequency = $("<button>")
+    .addClass("gameButton")
     .text(
       tower.frequency.canLevelUp()
         ? "UPGRADE FREQUENCY"
@@ -151,9 +163,9 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
         !tower.frequency.canLevelUp()
     );
 
-  action.append(range);
-  action.append(power);
-  action.append(frequency);
+  fieldButtons.append(range);
+  fieldButtons.append(power);
+  fieldButtons.append(frequency);
 };
 
 const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
@@ -177,4 +189,26 @@ export const showAlert = (alertMessage: string, alertAction: () => void) => {
   });
 
   alertElement.css("display", "flex");
+};
+
+export const createMessage = (message: string, variant: Variant) => {
+  const messageElement = $("<div>")
+    .addClass("message")
+    .text(message)
+    .css("background-color", getMessageColor(variant));
+  const messages = $("#messagesContent");
+  messages.prepend(messageElement);
+  return messageElement;
+};
+
+export const removeMessage = (messageElement: JQuery<HTMLElement>) => {
+  messageElement.remove();
+};
+
+const getMessageColor = (variant: Variant) => {
+  return variant === "error"
+    ? "#bf0a0a"
+    : variant === "success"
+    ? "#2a9117"
+    : "#1616d9";
 };

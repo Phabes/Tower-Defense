@@ -13,9 +13,11 @@ import {
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
+import { Message } from "./message";
 
 export class Game {
   levels: Level[];
+  messages: Message[];
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
@@ -24,11 +26,12 @@ export class Game {
 
   constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
     this.levels = [];
+    this.messages = [];
 
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
-    this.player = new Player(5, 500);
+    this.player = new Player(50, 500);
     this.board = new Board(this);
 
     this.retrieveLevels();
@@ -36,6 +39,7 @@ export class Game {
   }
 
   refreshLevelsSelection = () => {
+    this.player.levelCompleted();
     refreshSelectOptions(this.levels.length, this.player.level);
     showSelectLevel();
   };
@@ -50,11 +54,27 @@ export class Game {
     });
   };
 
+  levelNotCompleted = () => {
+    this.deleteMessages();
+    this.refreshLevelsSelection();
+  };
+
   levelCompleted = (level: Level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
-    this.player.levelCompleted();
+    this.deleteMessages();
     this.refreshLevelsSelection();
+  };
+
+  addMessage = (message: Message) => {
+    this.messages.push(message);
+  };
+
+  deleteMessages = () => {
+    for (const message of this.messages) {
+      message.deleteMessage();
+    }
+    this.messages = [];
   };
 
   prepareGame = (index: number) => {
@@ -70,6 +90,6 @@ export class Game {
   };
 
   createAlert = (alertMessage: string) => {
-    showAlert(alertMessage, this.refreshLevelsSelection);
+    showAlert(alertMessage, this.levelNotCompleted);
   };
 }

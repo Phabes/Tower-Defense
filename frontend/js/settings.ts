@@ -8,5 +8,6 @@ export const settings = {
   ENEMY_MONEY: 100,
   BULLET_SIZE: 20,
   BULLET_SPEED: 8,
+  MESSAGE_TTL: 5000,
   COOKIE: "tower-defence",
 };

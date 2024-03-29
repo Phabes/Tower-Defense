@@ -53,15 +53,15 @@ body {
 
 .gameButton {
   cursor: pointer;
-  border: 2px solid black;
+  border: 2px solid #49594e;
   border-radius: 10px;
   padding: 10px;
-  background-color: #0cb339;
+  background-color: #814ede;
   color: #ffffff;
 }
 
 .gameButton:hover {
-  background-color: #068027;
+  background-color: #5a33a3;
 }
 
 #timer {
@@ -96,7 +96,7 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 10px;
+  gap: 5px;
 }
 
 .playerInfo {
@@ -114,11 +114,67 @@ body {
   width: 100%;
 }
 
+#fieldOptions {
+  flex: 3;
+}
+
+#fieldButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#messages {
+  overflow: hidden;
+}
+
+#messagesTitle {
+  font-size: 30px;
+}
+
+#messagesContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-size: 20px;
+  overflow-y: scroll;
+  gap: 3px;
+}
+
+.message {
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.fading {
+  animation-name: fadingAnimation;
+  animation-duration: 1s;
+}
+
+@keyframes fadingAnimation {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.emphasisTitle {
+  font-size: 24px;
+}
+
+.emphasis {
+  font-size: 20px;
+}
+
 #loading {
   display: flex;
 }
 
-.loader {
+#loader {
   width: 48px;
   height: 48px;
   border: 5px solid #ffffff;

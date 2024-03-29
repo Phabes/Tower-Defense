@@ -26,6 +26,7 @@ export class Board {
   level: Level;
   round: number;
   animations: number;
+  spawnEnemiesInterval: number;
   selectedField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,
@@ -194,10 +195,10 @@ export class Board {
     let index = 0;
     this.enemiesGroup.add(this.enemies[index].spawn());
     this.enemies[index].setAlive(true);
-    const interval = setInterval(() => {
+    this.spawnEnemiesInterval = setInterval(() => {
       index++;
       if (index == numberOfEnemies) {
-        clearInterval(interval);
+        clearInterval(this.spawnEnemiesInterval);
         return;
       }
       this.enemiesGroup.add(this.enemies[index].spawn());
@@ -213,6 +214,7 @@ export class Board {
   };
 
   enemyFinishedPath = (enemy: Enemy) => {
+    enemy.success(this.game);
     this.removeEnemy(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
@@ -225,6 +227,7 @@ export class Board {
   };
 
   enemyDied = (enemy: Enemy) => {
+    enemy.died(this.game);
     this.removeEnemy(enemy);
     this.game.player.addMoney(enemy.money);
     showPlayerStats(this.game.player);
@@ -250,6 +253,7 @@ export class Board {
 
   stop = () => {
     boardOffClick();
+    clearInterval(this.spawnEnemiesInterval);
     cancelAnimationFrame(this.animations);
     this.deactivateTowers();
   };

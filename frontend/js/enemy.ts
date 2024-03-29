@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
 import { settings } from "./settings";
+import { Message } from "./message";
+import { Game } from "./game";
 
 export class Enemy extends THREE.Mesh {
   hp: number;
@@ -83,5 +85,23 @@ export class Enemy extends THREE.Mesh {
   takeDamage = (damage: number) => {
     this.hp -= damage;
     return this.hp > 0;
+  };
+
+  died = (game: Game) => {
+    const message = new Message(
+      `Enemy killed. +${this.money} gold`,
+      "success",
+      settings.MESSAGE_TTL
+    );
+    game.addMessage(message);
+  };
+
+  success = (game: Game) => {
+    const message = new Message(
+      "Enemy finished path.",
+      "error",
+      settings.MESSAGE_TTL
+    );
+    game.addMessage(message);
   };
 }

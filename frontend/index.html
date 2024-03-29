@@ -15,17 +15,25 @@
               <div class="playerIcon">
                 <img src="./assets/images/heart.png" alt="heart" />
               </div>
-              <div id="hpValue"></div>
+              <div class="emphasis" id="hpValue"></div>
             </div>
             <div class="playerInfo" id="money">
               <div class="playerIcon">
                 <img src="./assets/images/money.png" alt="money" />
               </div>
-              <div id="moneyValue"></div>
+              <div class="emphasis" id="moneyValue"></div>
             </div>
           </div>
-          <div class="pieceInfo" id="action"></div>
-          <div class="pieceInfo" id="messages"></div>
+          <div class="pieceInfo" id="fieldOptions">
+            <div class="emphasisTitle" id="fieldCoordsTitle"></div>
+            <div class="emphasis" id="coordY"></div>
+            <div class="emphasis" id="coordX"></div>
+            <div id="fieldButtons"></div>
+          </div>
+          <div class="pieceInfo" id="messages">
+            <div class="emphasisTitle" id="messagesTitle">Messages:</div>
+            <div class="emphasis" id="messagesContent"></div>
+          </div>
         </div>
         <div class="fullPanel" id="level">
           <div id="levelTitle">Choose Level:</div>
@@ -42,7 +50,7 @@
           <div id="alertContent"></div>
           <div class="gameButton" id="alertAccept">OK</div>
         </div>
-        <div class="fullPanel" id="loading"><span class="loader"></span></div>
+        <div class="fullPanel" id="loading"><span id="loader"></span></div>
       </div>
     </div>
     <script defer type="module" src="js/game.ts"></script>
