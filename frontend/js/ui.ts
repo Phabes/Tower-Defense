@@ -38,21 +38,13 @@ export const boardOffClick = () => {
   getBoardElement().off("click");
 };
 
-export const showSelectLevel = (
+export const refreshSelectOptions = (
   possibleLevels: number,
-  playerLevel: number,
-  prepareGame: (index: number) => void
+  playerLevel: number
 ) => {
-  clearLevel();
-  clearPlayer();
-  clearAction();
-  const levelElement = $("#level");
-  const title = $("<div>").attr("id", "levelTitle").text("Choose Level:");
-  levelElement.append(title);
-  const select = $("<select>").attr("id", "levelSelect");
-  const values: string[] = [];
+  const select = $("#levelSelect");
+  select.empty();
 
-  const container = $("<div>").attr("id", "levelChoiceContainer");
   for (let level = 0; level < possibleLevels; level++) {
     const disabled = playerLevel < level ? "disabled" : "";
     const selected =
@@ -65,21 +57,28 @@ export const showSelectLevel = (
     if (selected) {
       option.attr("selected", "selected");
     }
-    values.push(level.toString());
     select.append(option);
   }
-  container.append(select);
-  const button = $("<div>")
-    .attr("id", "startLevel")
-    .text("START")
-    .on("click", () => {
-      const value = $("#levelSelect").val();
-      const index = values.indexOf(value!.toString());
-      clearLevel();
-      prepareGame(index);
-    });
-  container.append(button);
-  levelElement.append(container);
+};
+
+export const startButtonClick = (prepareGame: (index: number) => void) => {
+  const select = $("#levelSelect");
+  const button = $("#startLevel");
+
+  button.off("click");
+  button.on("click", () => {
+    const value = select.val();
+    const levelElement = $("#level");
+    levelElement.css("display", "none");
+    prepareGame(parseInt(value!.toString()));
+  });
+};
+
+export const showSelectLevel = () => {
+  clearAction();
+  const levelElement = $("#level");
+  levelElement.css("display", "flex");
+  // const button = $("#startLevel"); // to delete
   // button.trigger("click"); // to delete
 };
 

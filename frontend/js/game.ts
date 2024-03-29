@@ -2,7 +2,12 @@ import * as THREE from "three";
 import { getLevels } from "./net";
 import { Board } from "./board";
 import { Player } from "./player";
-import { showSelectLevel, windowResize } from "./ui";
+import {
+  refreshSelectOptions,
+  showSelectLevel,
+  startButtonClick,
+  windowResize,
+} from "./ui";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
@@ -28,11 +33,17 @@ export class Game {
     windowResize(camera, renderer);
   }
 
+  refreshLevelsSelection = () => {
+    refreshSelectOptions(this.levels.length, this.player.level);
+    showSelectLevel();
+  };
+
   retrieveLevels = () => {
     getLevels().done((res) => {
       const levels = res.levels;
       this.levels = levels;
-      showSelectLevel(this.levels.length, this.player.level, this.prepareGame);
+      this.refreshLevelsSelection();
+      startButtonClick(this.prepareGame);
     });
   };
 
@@ -40,7 +51,7 @@ export class Game {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
     this.player.levelCompleted();
-    showSelectLevel(this.levels.length, this.player.level, this.prepareGame);
+    this.refreshLevelsSelection();
   };
 
   prepareGame = (index: number) => {

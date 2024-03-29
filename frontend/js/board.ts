@@ -217,8 +217,7 @@ export class Board {
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
-      boardOffClick();
-      cancelAnimationFrame(this.animations);
+      this.stop();
       return;
     }
     this.checkFinishRound();
@@ -236,17 +235,22 @@ export class Board {
 
   checkFinishRound = () => {
     const activeEnemies = this.enemies.filter((e) => e.active).length;
-    if (activeEnemies == 0) {
-      const nextRound = this.round + 1;
-      if (nextRound >= this.level.waves.length) {
-        boardOffClick();
-        cancelAnimationFrame(this.animations);
-        this.deactivateTowers();
-        this.game.levelCompleted(this.level);
-        return;
-      }
-      this.prepareRound(nextRound);
+    if (activeEnemies != 0) {
+      return;
     }
+    const nextRound = this.round + 1;
+    if (nextRound >= this.level.waves.length) {
+      this.stop();
+      this.game.levelCompleted(this.level);
+      return;
+    }
+    this.prepareRound(nextRound);
+  };
+
+  stop = () => {
+    boardOffClick();
+    cancelAnimationFrame(this.animations);
+    this.deactivateTowers();
   };
 
   deactivateTowers = () => {
