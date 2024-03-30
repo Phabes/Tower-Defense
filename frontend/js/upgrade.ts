@@ -39,7 +39,7 @@ export class Upgrade {
     this.level++;
     this.value += this.nextUpgradeIncrease;
     const message = new Message(
-      `${this.name} upgrade done successfully. -${this.nextUpgradeCost}`,
+      `${this.name} upgraded. -${this.nextUpgradeCost} gold`,
       "informative",
       settings.MESSAGE_TTL
     );
