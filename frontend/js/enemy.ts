@@ -15,7 +15,7 @@ export class Enemy extends THREE.Group {
   enemyFinishedPath: (e: Enemy) => void;
   alive: boolean;
   active: boolean;
-  private animation: Animation;
+  animation: Animation;
   enemyModel: THREE.Object3D<THREE.Object3DEventMap>;
 
   constructor(
@@ -52,13 +52,12 @@ export class Enemy extends THREE.Group {
     );
 
     const models = Models.getInstance();
-    const enemyModel = models.getEnemyModelClone();
-    this.enemyModel = enemyModel;
+    this.enemyModel = models.getEnemyModelClone();
     const enemyClips = models.getEnemyClips();
-    this.animation = new Animation(enemyModel, enemyClips);
+    this.animation = new Animation(this.enemyModel, enemyClips);
     this.animation.setAnimation("Walk");
 
-    this.add(enemyModel);
+    this.add(this.enemyModel);
 
     return this;
   };
@@ -70,16 +69,20 @@ export class Enemy extends THREE.Group {
 
     this.animation.animate();
 
-    const angle = Math.atan2(
-      this.nextField.position.clone().x - this.currentField.position.clone().x,
-      this.currentField.position.clone().y - this.nextField.position.clone().y
-    );
-    const moveVector = this.nextField.position
+    const currentFieldPosition = this.currentField.position;
+    const nextFieldPosition = this.nextField.position;
+    const moveVector = nextFieldPosition
       .clone()
-      .sub(this.currentField.position)
+      .sub(currentFieldPosition)
       .normalize();
     this.translateOnAxis(moveVector, this.speed);
+
+    const angle = Math.atan2(
+      nextFieldPosition.x - currentFieldPosition.x,
+      currentFieldPosition.y - nextFieldPosition.y
+    );
     this.enemyModel.rotation.y = angle;
+
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
       this.nextField = this.nextField.getRandomNextField();
