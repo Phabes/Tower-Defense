@@ -2,13 +2,22 @@ import * as THREE from "three";
 import { getLevels } from "./net";
 import { Board } from "./board";
 import { Player } from "./player";
-import { showSelectLevel, windowResize } from "./ui";
+import {
+  refreshSelectOptions,
+  removeLoading,
+  showAlert,
+  showSelectLevel,
+  startButtonClick,
+  windowResize,
+} from "./ui";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
+import { Message } from "./message";
 
 export class Game {
   levels: Level[];
+  messages: Message[];
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
@@ -17,30 +26,55 @@ export class Game {
 
   constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
     this.levels = [];
+    this.messages = [];
 
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
-    this.player = new Player(20, 500);
+    this.player = new Player(10, 500);
     this.board = new Board(this);
 
     this.retrieveLevels();
     windowResize(camera, renderer);
   }
 
+  refreshLevelsSelection = () => {
+    this.player.levelCompleted();
+    refreshSelectOptions(this.levels.length, this.player.level);
+    showSelectLevel();
+  };
+
   retrieveLevels = () => {
     getLevels().done((res) => {
       const levels = res.levels;
       this.levels = levels;
-      showSelectLevel(this.levels.length, this.player.level, this.prepareGame);
+      removeLoading();
+      this.refreshLevelsSelection();
+      startButtonClick(this.prepareGame);
     });
+  };
+
+  levelNotCompleted = () => {
+    this.deleteMessages();
+    this.refreshLevelsSelection();
   };
 
   levelCompleted = (level: Level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
-    this.player.levelCompleted();
-    showSelectLevel(this.levels.length, this.player.level, this.prepareGame);
+    this.deleteMessages();
+    this.refreshLevelsSelection();
+  };
+
+  addMessage = (message: Message) => {
+    this.messages.push(message);
+  };
+
+  deleteMessages = () => {
+    for (const message of this.messages) {
+      message.deleteMessage();
+    }
+    this.messages = [];
   };
 
   prepareGame = (index: number) => {
@@ -53,5 +87,9 @@ export class Game {
 
   startRound = () => {
     this.board.startRound();
+  };
+
+  createAlert = (alertMessage: string) => {
+    showAlert(alertMessage, this.levelNotCompleted);
   };
 }

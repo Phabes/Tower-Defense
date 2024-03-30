@@ -4,25 +4,21 @@ import { Renderer } from "./renderer";
 import { Tower } from "./tower";
 import { Player } from "./player";
 import { Upgrade } from "./upgrade";
+import { Variant } from "./types";
 
 export const getBoardElement = () => {
   return $("#board");
 };
 
-export const clearLevel = () => {
-  $("#level").empty();
+export const clearFieldOptions = () => {
+  $("#fieldCoordsTitle").empty();
+  $("#coordY").empty();
+  $("#coordX").empty();
+  $("#fieldButtons").empty();
 };
 
-export const clearTimer = () => {
-  $("#timer").empty();
-};
-
-export const clearPlayer = () => {
-  $("#player").empty();
-};
-
-export const clearAction = () => {
-  $("#action").empty();
+export const removeLoading = () => {
+  $("#loading").remove();
 };
 
 export const windowResize = (camera: Camera, renderer: Renderer) => {
@@ -42,17 +38,12 @@ export const boardOffClick = () => {
   getBoardElement().off("click");
 };
 
-export const showSelectLevel = (
+export const refreshSelectOptions = (
   possibleLevels: number,
-  playerLevel: number,
-  prepareGame: (index: number) => void
+  playerLevel: number
 ) => {
-  clearLevel();
-  clearPlayer();
-  clearAction();
-  const levelElement = $("#level");
-  const select = $("<select>").attr("id", "levelSelect");
-  const values: string[] = [];
+  const select = $("#levelSelect");
+  select.empty();
 
   for (let level = 0; level < possibleLevels; level++) {
     const disabled = playerLevel < level ? "disabled" : "";
@@ -66,63 +57,82 @@ export const showSelectLevel = (
     if (selected) {
       option.attr("selected", "selected");
     }
-    values.push(level.toString());
     select.append(option);
   }
-  levelElement.append(select);
-  const button = $("<button>")
-    .text("START")
-    .on("click", () => {
-      const value = $("#levelSelect").val();
-      const index = values.indexOf(value!.toString());
-      clearLevel();
-      prepareGame(index);
-    });
-  levelElement.append(button);
+};
+
+export const startButtonClick = (prepareGame: (index: number) => void) => {
+  const select = $("#levelSelect");
+  const button = $("#startLevel");
+
+  button.off("click");
+  button.on("click", () => {
+    const value = select.val();
+    const levelElement = $("#level");
+    levelElement.css("display", "none");
+    prepareGame(parseInt(value!.toString()));
+  });
+};
+
+export const showSelectLevel = () => {
+  clearFieldOptions();
+  const levelElement = $("#level");
+  levelElement.css("display", "flex");
+  // const button = $("#startLevel"); // to delete
   // button.trigger("click"); // to delete
 };
 
 export const setTimer = (time: number, startRound: () => void) => {
-  clearTimer();
   const timer = $("#timer");
-  timer.text(time--);
+  const timeElement = $("#timeElement");
+  timeElement.text(time--);
+  timer.css("display", "flex");
+
   const interval = setInterval(() => {
     if (time == 0) {
       clearInterval(interval);
-      clearTimer();
+      timer.css("display", "none");
       startRound();
       return;
     }
-    timer.text(time--);
+    timeElement.text(time--);
   }, 1000);
 };
 
 export const showPlayerStats = (player: Player) => {
-  clearPlayer();
-  const playerElement = $("#player");
-  playerElement.text(`hp: ${player.hp}, money: ${player.money}`);
+  const playerHP = $("#hpValue");
+  playerHP.text(player.hp);
+  const playerMoney = $("#moneyValue");
+  playerMoney.text(player.money);
 };
 
 export const showTowerPanel = (tower: Tower | null, player: Player) => {
-  clearAction();
-  showPlayerStats(player);
+  clearFieldOptions();
   if (!tower) {
     return;
   }
 
-  const action = $("#action");
-  action.text(`y: ${tower.building.coord.y}, x: ${tower.building.coord.x}`);
+  const fieldCoordsTitle = $("#fieldCoordsTitle");
+  const coordY = $("#coordY");
+  const coordX = $("#coordX");
+  const fieldButtons = $("#fieldButtons");
+
+  fieldCoordsTitle.text("Coordinates:");
+  coordY.text("Y: " + tower.building.coord.y);
+  coordX.text("X: " + tower.building.coord.x);
 
   if (!tower.active) {
     const activate = $("<button>")
+      .addClass("gameButton")
       .text("ACTIVATE TOWER")
       .on("click", () => upgradeClick(tower, tower.activeCost, player))
       .prop("disabled", !player.canBuy(tower.activeCost.nextUpgradeCost));
-    action.append(activate);
+    fieldButtons.append(activate);
     return;
   }
 
   const range = $("<button>")
+    .addClass("gameButton")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))
     .prop(
@@ -131,6 +141,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
     );
 
   const power = $("<button>")
+    .addClass("gameButton")
     .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
     .on("click", () => upgradeClick(tower, tower.power, player))
     .prop(
@@ -139,6 +150,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
     );
 
   const frequency = $("<button>")
+    .addClass("gameButton")
     .text(
       tower.frequency.canLevelUp()
         ? "UPGRADE FREQUENCY"
@@ -151,9 +163,9 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
         !tower.frequency.canLevelUp()
     );
 
-  action.append(range);
-  action.append(power);
-  action.append(frequency);
+  fieldButtons.append(range);
+  fieldButtons.append(power);
+  fieldButtons.append(frequency);
 };
 
 const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
@@ -162,4 +174,41 @@ const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
     upgrade.levelUp();
     showTowerPanel(tower, player);
   }
+};
+
+export const showAlert = (alertMessage: string, alertAction: () => void) => {
+  const alertElement = $("#alert");
+  const alertContent = $("#alertContent");
+  alertContent.text(alertMessage);
+
+  const button = $("#alertAccept");
+  button.off("click");
+  button.on("click", () => {
+    alertElement.css("display", "none");
+    alertAction();
+  });
+
+  alertElement.css("display", "flex");
+};
+
+export const createMessage = (message: string, variant: Variant) => {
+  const messageElement = $("<div>")
+    .addClass("message")
+    .text(message)
+    .css("background-color", getMessageColor(variant));
+  const messages = $("#messagesContent");
+  messages.prepend(messageElement);
+  return messageElement;
+};
+
+export const removeMessage = (messageElement: JQuery<HTMLElement>) => {
+  messageElement.remove();
+};
+
+const getMessageColor = (variant: Variant) => {
+  return variant === "error"
+    ? "#bf0a0a"
+    : variant === "success"
+    ? "#2a9117"
+    : "#1616d9";
 };

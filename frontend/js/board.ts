@@ -26,6 +26,7 @@ export class Board {
   level: Level;
   round: number;
   animations: number;
+  spawnEnemiesInterval: number;
   selectedField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,
@@ -194,10 +195,10 @@ export class Board {
     let index = 0;
     this.enemiesGroup.add(this.enemies[index].spawn());
     this.enemies[index].setAlive(true);
-    const interval = setInterval(() => {
+    this.spawnEnemiesInterval = setInterval(() => {
       index++;
       if (index == numberOfEnemies) {
-        clearInterval(interval);
+        clearInterval(this.spawnEnemiesInterval);
         return;
       }
       this.enemiesGroup.add(this.enemies[index].spawn());
@@ -213,18 +214,20 @@ export class Board {
   };
 
   enemyFinishedPath = (enemy: Enemy) => {
+    enemy.success(this.game);
     this.removeEnemy(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
     if (this.game.player.hp == 0) {
-      boardOffClick();
-      cancelAnimationFrame(this.animations);
+      this.stop();
+      this.game.createAlert("Game Over");
       return;
     }
     this.checkFinishRound();
   };
 
   enemyDied = (enemy: Enemy) => {
+    enemy.died(this.game);
     this.removeEnemy(enemy);
     this.game.player.addMoney(enemy.money);
     showPlayerStats(this.game.player);
@@ -236,17 +239,23 @@ export class Board {
 
   checkFinishRound = () => {
     const activeEnemies = this.enemies.filter((e) => e.active).length;
-    if (activeEnemies == 0) {
-      const nextRound = this.round + 1;
-      if (nextRound >= this.level.waves.length) {
-        boardOffClick();
-        cancelAnimationFrame(this.animations);
-        this.deactivateTowers();
-        this.game.levelCompleted(this.level);
-        return;
-      }
-      this.prepareRound(nextRound);
+    if (activeEnemies != 0) {
+      return;
     }
+    const nextRound = this.round + 1;
+    if (nextRound >= this.level.waves.length) {
+      this.stop();
+      this.game.levelCompleted(this.level);
+      return;
+    }
+    this.prepareRound(nextRound);
+  };
+
+  stop = () => {
+    boardOffClick();
+    clearInterval(this.spawnEnemiesInterval);
+    cancelAnimationFrame(this.animations);
+    this.deactivateTowers();
   };
 
   deactivateTowers = () => {
