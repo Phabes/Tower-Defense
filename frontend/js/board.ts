@@ -8,12 +8,14 @@ import { Building } from "./fields/building";
 import { Path } from "./fields/path";
 import {
   boardClick,
+  boardMouseMove,
   boardOffClick,
   getBoardElement,
   setTimer,
   showPlayerStats,
 } from "./ui";
 import { Tower } from "./tower";
+import { event } from "jquery";
 
 export class Board {
   game: Game;
@@ -28,6 +30,7 @@ export class Board {
   animations: number;
   spawnEnemiesInterval: number;
   selectedField: Field | null;
+  hoveredField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,
   //   THREE.MeshBasicMaterial,
@@ -48,13 +51,32 @@ export class Board {
     this.enemiesGroup = new THREE.Group();
     this.raycaster = new THREE.Raycaster();
     this.selectedField = null;
+
+  }
+
+  onHover = (event: JQuery.MouseEnterEvent)=>{
+    const pointer = this.getMouseVector2(event)
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Field ) {
+          if (object.type != "path" && object != this.hoveredField)
+          {
+            this.hoveredField?.colorField()
+            this.hoveredField = object
+            object.highlight()
+          }
+        } 
+      }
+    }
   }
 
   click = (event: JQuery.ClickEvent) => {
-    const pointer = new THREE.Vector2();
-    const boardElement = getBoardElement();
-    pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
-    pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
+    const pointer = this.getMouseVector2(event)
     this.raycaster.setFromCamera(pointer, this.game.camera);
 
     const intersects = this.raycaster.intersectObjects(
@@ -64,12 +86,14 @@ export class Board {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
         if (this.selectedField) {
-          this.selectedField.colorField(false);
+          this.selectedField.unSelect();
+          this.selectedField.colorField();
           this.selectedField.showPanel(false, this.game.player);
         }
         if (object instanceof Building) {
           this.selectedField = object;
-          this.selectedField.colorField(true);
+          this.selectedField.select();
+          this.selectedField.colorField();
           this.selectedField.showPanel(true, this.game.player);
         } else {
           this.selectedField = null;
@@ -118,6 +142,7 @@ export class Board {
 
     this.setPath();
     boardClick(this.click);
+    boardMouseMove(this.onHover)
     this.animate();
   };
 
@@ -303,6 +328,15 @@ export class Board {
     this.game.renderer.renderGame();
   };
 
+  getMouseVector2 = (event: JQuery.MouseEventBase) =>{
+
+    const pointer = new THREE.Vector2();
+    const boardElement = getBoardElement();
+    pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
+    pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
+
+    return pointer;
+  }
   // createPlayerStats = () => {
   //   this.createHeart();
   //   this.createCoin();
