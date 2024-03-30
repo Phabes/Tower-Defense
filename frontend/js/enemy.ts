@@ -3,8 +3,10 @@ import { Field } from "./fields/field";
 import { settings } from "./settings";
 import { Message } from "./message";
 import { Mailbox } from "./mailbox";
+import { Models } from "./models";
+import { Animation } from "./animation";
 
-export class Enemy extends THREE.Mesh {
+export class Enemy extends THREE.Group {
   hp: number;
   speed: number;
   money: number;
@@ -13,6 +15,8 @@ export class Enemy extends THREE.Mesh {
   enemyFinishedPath: (e: Enemy) => void;
   alive: boolean;
   active: boolean;
+  private animation: Animation;
+  enemyModel: THREE.Object3D<THREE.Object3DEventMap>;
 
   constructor(
     hp: number,
@@ -41,13 +45,21 @@ export class Enemy extends THREE.Mesh {
   };
 
   spawn = () => {
-    this.geometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
-    this.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     this.position.set(
       this.currentField.position.x,
       this.currentField.position.y,
       this.currentField.position.z
     );
+
+    const models = Models.getInstance();
+    const enemyModel = models.getEnemyModelClone();
+    this.enemyModel = enemyModel;
+    const enemyClips = models.getEnemyClips();
+    this.animation = new Animation(enemyModel, enemyClips);
+    this.animation.setAnimation("Walk");
+
+    this.add(enemyModel);
+
     return this;
   };
 
@@ -55,11 +67,19 @@ export class Enemy extends THREE.Mesh {
     if (!this.nextField) {
       return;
     }
+
+    this.animation.animate();
+
+    const angle = Math.atan2(
+      this.nextField.position.clone().x - this.currentField.position.clone().x,
+      this.currentField.position.clone().y - this.nextField.position.clone().y
+    );
     const moveVector = this.nextField.position
       .clone()
       .sub(this.currentField.position)
       .normalize();
     this.translateOnAxis(moveVector, this.speed);
+    this.enemyModel.rotation.y = angle;
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
       this.nextField = this.nextField.getRandomNextField();

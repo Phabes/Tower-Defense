@@ -24,7 +24,7 @@ export class Renderer extends THREE.WebGLRenderer {
     this.renderGame();
   };
 
-  addRenderer = (boardElement) => {
+  addRenderer = (boardElement: JQuery<HTMLElement>) => {
     boardElement.append(this.domElement);
   };
 

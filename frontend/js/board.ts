@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { settings } from "./settings";
 import { Enemy } from "./enemy";
 import { Field } from "./fields/field";
@@ -118,6 +119,7 @@ export class Board {
 
     this.setPath();
     boardClick(this.click);
+
     this.animate();
   };
 
