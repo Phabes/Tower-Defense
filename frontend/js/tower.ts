@@ -14,26 +14,33 @@ export class Tower extends THREE.Mesh {
   frequency: Upgrade;
   targets: Enemy[];
   bullets: Bullet[];
-  shooting: number;
+  shooting: NodeJS.Timeout;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
     super();
     this.building = building;
     this.active = false;
-    this.activeCost = new Upgrade(1, 0, 200, 0, this.activate);
+    this.activeCost = new Upgrade("Activate", 1, 0, 200, 0, this.activate);
     this.range = new Upgrade(
+      "Range",
       2,
       settings.FIELD_SIZE + settings.FIELD_SIZE / 2,
       300,
       1,
       this.rebuildTower
     );
-    this.power = new Upgrade(2, 50, 250, 50, this.rebuildTower);
-    this.frequency = new Upgrade(1, 600, 200, -200, this.upgradeFrequency);
+    this.power = new Upgrade("Power", 2, 50, 250, 50, this.rebuildTower);
+    this.frequency = new Upgrade(
+      "Frequency",
+      1,
+      600,
+      200,
+      -200,
+      this.upgradeFrequency
+    );
     this.targets = [];
     this.bullets = [];
-    this.shooting = 0;
     this.upgradeBuilding = upgradeBuilding;
     this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }

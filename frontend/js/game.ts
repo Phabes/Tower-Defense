@@ -13,11 +13,10 @@ import {
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
-import { Message } from "./message";
+import { Mailbox } from "./mailbox";
 
 export class Game {
   levels: Level[];
-  messages: Message[];
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
@@ -26,7 +25,6 @@ export class Game {
 
   constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
     this.levels = [];
-    this.messages = [];
 
     this.scene = scene;
     this.camera = camera;
@@ -55,26 +53,15 @@ export class Game {
   };
 
   levelNotCompleted = () => {
-    this.deleteMessages();
+    Mailbox.getInstance().deleteMessages();
     this.refreshLevelsSelection();
   };
 
   levelCompleted = (level: Level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
-    this.deleteMessages();
+    Mailbox.getInstance().deleteMessages();
     this.refreshLevelsSelection();
-  };
-
-  addMessage = (message: Message) => {
-    this.messages.push(message);
-  };
-
-  deleteMessages = () => {
-    for (const message of this.messages) {
-      message.deleteMessage();
-    }
-    this.messages = [];
   };
 
   prepareGame = (index: number) => {
