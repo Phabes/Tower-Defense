@@ -41,7 +41,9 @@ export class Models {
   };
 
   getEnemyModelClone = () => {
-    return SkeletonUtils.clone(this.enemyModel);
+    const container = new THREE.Object3D();
+    container.add(SkeletonUtils.clone(this.enemyModel));
+    return container;
   };
 
   getEnemyClips = () => {

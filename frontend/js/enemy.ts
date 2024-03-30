@@ -16,7 +16,7 @@ export class Enemy extends THREE.Group {
   alive: boolean;
   active: boolean;
   animation: Animation;
-  enemyModel: THREE.Object3D<THREE.Object3DEventMap>;
+  enemyContainer: THREE.Object3D;
 
   constructor(
     hp: number,
@@ -52,12 +52,12 @@ export class Enemy extends THREE.Group {
     );
 
     const models = Models.getInstance();
-    this.enemyModel = models.getEnemyModelClone();
+    this.enemyContainer = models.getEnemyModelClone();
     const enemyClips = models.getEnemyClips();
-    this.animation = new Animation(this.enemyModel, enemyClips);
+    this.animation = new Animation(this.enemyContainer, enemyClips);
     this.animation.setAnimation("Walk");
 
-    this.add(this.enemyModel);
+    this.add(this.enemyContainer);
 
     return this;
   };
@@ -69,19 +69,17 @@ export class Enemy extends THREE.Group {
 
     this.animation.animate();
 
-    const currentFieldPosition = this.currentField.position;
-    const nextFieldPosition = this.nextField.position;
-    const moveVector = nextFieldPosition
+    const moveVector = this.nextField.position
       .clone()
-      .sub(currentFieldPosition)
+      .sub(this.currentField.position)
       .normalize();
     this.translateOnAxis(moveVector, this.speed);
 
     const angle = Math.atan2(
-      nextFieldPosition.x - currentFieldPosition.x,
-      currentFieldPosition.y - nextFieldPosition.y
+      this.currentField.coord.y - this.nextField.coord.y,
+      this.nextField.coord.x - this.currentField.coord.x
     );
-    this.enemyModel.rotation.y = angle;
+    this.enemyContainer.rotation.z = angle;
 
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
