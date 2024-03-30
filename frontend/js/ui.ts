@@ -122,46 +122,47 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
   coordX.text("X: " + tower.building.coord.x);
 
   if (!tower.active) {
+    const disabledUpgradeActivate = !player.canBuy(
+      tower.activeCost.nextUpgradeCost
+    );
     const activate = $("<button>")
-      .addClass("gameButton")
+      .addClass(disabledUpgradeActivate ? "disabledGameButton" : "gameButton")
       .text("ACTIVATE TOWER")
       .on("click", () => upgradeClick(tower, tower.activeCost, player))
-      .prop("disabled", !player.canBuy(tower.activeCost.nextUpgradeCost));
+      .prop("disabled", disabledUpgradeActivate);
+
     fieldButtons.append(activate);
     return;
   }
 
+  const disabledUpgradeRange =
+    !player.canBuy(tower.range.nextUpgradeCost) || !tower.range.canLevelUp();
   const range = $("<button>")
-    .addClass("gameButton")
+    .addClass(disabledUpgradeRange ? "disabledGameButton" : "gameButton")
     .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
     .on("click", () => upgradeClick(tower, tower.range, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.range.nextUpgradeCost) || !tower.range.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradeRange);
 
+  const disabledUpgradePower =
+    !player.canBuy(tower.power.nextUpgradeCost) || !tower.power.canLevelUp();
   const power = $("<button>")
-    .addClass("gameButton")
+    .addClass(disabledUpgradePower ? "disabledGameButton" : "gameButton")
     .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
     .on("click", () => upgradeClick(tower, tower.power, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.power.nextUpgradeCost) || !tower.power.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradePower);
 
+  const disabledUpgradeFrequency =
+    !player.canBuy(tower.frequency.nextUpgradeCost) ||
+    !tower.frequency.canLevelUp();
   const frequency = $("<button>")
-    .addClass("gameButton")
+    .addClass(disabledUpgradeFrequency ? "disabledGameButton" : "gameButton")
     .text(
       tower.frequency.canLevelUp()
         ? "UPGRADE FREQUENCY"
         : "MAX FREQUENCY FREQUENCY"
     )
     .on("click", () => upgradeClick(tower, tower.frequency, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.frequency.nextUpgradeCost) ||
-        !tower.frequency.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradeFrequency);
 
   fieldButtons.append(range);
   fieldButtons.append(power);
@@ -171,6 +172,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
 const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
   if (player.canBuy(upgrade.nextUpgradeCost)) {
     player.substractMoney(upgrade.nextUpgradeCost);
+    showPlayerStats(player);
     upgrade.levelUp();
     showTowerPanel(tower, player);
   }

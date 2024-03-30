@@ -26,7 +26,7 @@ export class Board {
   level: Level;
   round: number;
   animations: number;
-  spawnEnemiesInterval: number;
+  spawnEnemiesInterval: NodeJS.Timeout;
   selectedField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,
@@ -214,7 +214,7 @@ export class Board {
   };
 
   enemyFinishedPath = (enemy: Enemy) => {
-    enemy.success(this.game);
+    enemy.success();
     this.removeEnemy(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
@@ -227,7 +227,7 @@ export class Board {
   };
 
   enemyDied = (enemy: Enemy) => {
-    enemy.died(this.game);
+    enemy.died();
     this.removeEnemy(enemy);
     this.game.player.addMoney(enemy.money);
     showPlayerStats(this.game.player);

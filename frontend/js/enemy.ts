@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Field } from "./fields/field";
 import { settings } from "./settings";
 import { Message } from "./message";
-import { Game } from "./game";
+import { Mailbox } from "./mailbox";
 
 export class Enemy extends THREE.Mesh {
   hp: number;
@@ -87,21 +87,21 @@ export class Enemy extends THREE.Mesh {
     return this.hp > 0;
   };
 
-  died = (game: Game) => {
+  died = () => {
     const message = new Message(
       `Enemy killed. +${this.money} gold`,
       "success",
       settings.MESSAGE_TTL
     );
-    game.addMessage(message);
+    Mailbox.getInstance().addMessage(message);
   };
 
-  success = (game: Game) => {
+  success = () => {
     const message = new Message(
       "Enemy finished path.",
       "error",
       settings.MESSAGE_TTL
     );
-    game.addMessage(message);
+    Mailbox.getInstance().addMessage(message);
   };
 }
