@@ -48,7 +48,7 @@ body {
 }
 
 #levelSelect {
-  height: min-content;
+  font-size: 20px;
 }
 
 .gameButton {
@@ -150,6 +150,7 @@ body {
 }
 
 .message {
+  margin: 0 10px;
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
