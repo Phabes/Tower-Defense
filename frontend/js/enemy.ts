@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { Field } from "./fields/field";
 import { settings } from "./settings";
 import { Message } from "./message";
-import { Game } from "./game";
 import { Mailbox } from "./mailbox";
 
 export class Enemy extends THREE.Mesh {
