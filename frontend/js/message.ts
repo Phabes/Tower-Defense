@@ -1,3 +1,4 @@
+import { Mailbox } from "./mailbox";
 import { Status, Variant } from "./types";
 import { createMessage, removeMessage } from "./ui";
 
@@ -7,7 +8,7 @@ export class Message {
   ttl: number;
   status: Status;
   messageElement: JQuery<HTMLElement>;
-  messageInteval: number;
+  messageInteval: NodeJS.Timeout;
 
   constructor(message: string, variant: Variant, ttl: number) {
     this.message = message;
@@ -39,6 +40,7 @@ export class Message {
   deleteMessage = () => {
     clearInterval(this.messageInteval);
     removeMessage(this.messageElement);
+    Mailbox.getInstance().removeMessage(this);
   };
 
   messageClick = () => {
