@@ -18,6 +18,7 @@ import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
 import { Message } from "./message";
+import { BoardCreator } from "./boardCreator";
 
 export class Game {
   levels: Level[];
@@ -47,7 +48,15 @@ export class Game {
     windowResize(this.camera, this.renderer);
   }
 
-  
+  startLevelCreator = (width:number, height:number) => {
+    if (this.board)
+      this.board.clearBoard()
+    this.board = new BoardCreator(this, width, height);
+    this.board.createBoard();
+    this.camera.setCamera();
+    this.renderer.renderGame();
+    windowResize(this.camera, this.renderer);
+  }
 
   refreshLevelsSelection = () => {
     this.player.levelCompleted();

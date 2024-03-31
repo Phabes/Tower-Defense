@@ -116,7 +116,7 @@ export class Board {
   createBoard = () => {
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
-
+    
     const mapSizeY = this.level.map.length;
     for (let i = 0; i < this.level.map.length; i++) {
       const row: Field[] = [];

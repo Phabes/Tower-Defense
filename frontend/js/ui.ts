@@ -27,6 +27,10 @@ export const removeWelcome = () => {
   $("#welcome").remove();
 };
 
+export const showCreator = () => {
+  $("#creator").css({"display":"block"});
+};
+
 export const windowResize = (camera: Camera, renderer: Renderer) => {
   $(window).on("resize", () => {
     const boardElement = getBoardElement();
@@ -231,26 +235,29 @@ export const welcomeButtonsHandler = (game: Game) => {
   startButton.off("click");
   startButton.on("click", () => {
     game.startGame()
+  });
 
+  createButton.off("click");
+  createButton.on("click", () => {
+    showBoardSizePanel(game)
+   
   });
 }
 
+const showBoardSizePanel = (game: Game) => {
+  removeWelcome();
+  removeLoading();
+  showCreator();
 
-const showBoardSizePanel = () => {
-  const levelPanel = $("#level");
-  levelPanel.css("display", "none");
-  const creatorPanel = $("#creator");
-  creatorPanel.css("display", "block");
+  const createBoardButton = $("#createBoard");
 
-  const button = $("#createBoard")
-  button.off("click");
-  button.on("click", () => {
+  createBoardButton.off("click");
+  createBoardButton.on("click", () => {
     const reg = /^\d+$/;
-    const width = $("#newBoardWidth").val();
-    const height = $("#newBoardHeight").val();
-    if (reg.test(width) && reg.test(height) ){
-      showBoardCreator(parseInt(width),parseInt(height));
+    const width = $("#newBoardWidth").val() as string;
+    const height = $("#newBoardHeight").val() as string;
+    if (reg.test(width) && reg.test(height)) {
+      game.startLevelCreator(parseInt(width), parseInt(height));
     }
-
   });
 }
