@@ -24,10 +24,10 @@ export class Board {
   boardGroup: THREE.Group<THREE.Object3DEventMap>;
   enemiesGroup: THREE.Group<THREE.Object3DEventMap>;
   raycaster: THREE.Raycaster;
-  level: Level;
-  round: number;
-  animations: number;
-  spawnEnemiesInterval: NodeJS.Timeout;
+  level!: Level;
+  round!: number;
+  animations!: number;
+  spawnEnemiesInterval!: NodeJS.Timeout;
   selectedField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,

@@ -6,7 +6,7 @@ import { Bullet } from "./bullet";
 import { Enemy } from "./enemy";
 import { Models } from "./models";
 
-export class Tower extends THREE.Mesh {
+export class Tower extends THREE.Group {
   building: Building;
   active: boolean;
   activeCost: Upgrade;
@@ -15,7 +15,7 @@ export class Tower extends THREE.Mesh {
   frequency: Upgrade;
   targets: Enemy[];
   bullets: Bullet[];
-  shooting: NodeJS.Timeout;
+  shooting: NodeJS.Timeout | undefined;
   towerContainer: THREE.Object3D;
   height: number;
   upgradeBuilding: () => void;
@@ -44,8 +44,9 @@ export class Tower extends THREE.Mesh {
     );
     this.targets = [];
     this.bullets = [];
+    this.towerContainer = Models.getInstance().getTowerModelClone();
+    this.height = this.calculateTowerHeight();
     this.upgradeBuilding = upgradeBuilding;
-    this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }
 
   setTargets = (targets: Enemy[]) => {
@@ -107,14 +108,14 @@ export class Tower extends THREE.Mesh {
 
   upgradeTower = () => {
     this.towerContainer = Models.getInstance().getTowerModelClone();
-    this.calculateTowerHeight();
+    this.height = this.calculateTowerHeight();
     this.add(this.towerContainer);
   };
 
   calculateTowerHeight = () => {
     const size = new THREE.Vector3();
     new THREE.Box3().setFromObject(this.towerContainer).getSize(size);
-    this.height = size.z;
+    return size.z;
   };
 
   inRange = (objectPosition3d: THREE.Vector3) => {

@@ -19,6 +19,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
     super();
     this.coord = coord;
     this.type = type;
+    this.nextFields = [];
     this.elementsOnField = new THREE.Group();
   }
 

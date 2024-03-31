@@ -13,9 +13,9 @@ export class Models {
   private constructor() {
     this.enemyClips = [];
 
-    const geometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
-    const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-    this.enemyModel = new THREE.Mesh(geometry, material);
+    const enemyGeometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
+    const enemyMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    this.enemyModel = new THREE.Mesh(enemyGeometry, enemyMaterial);
 
     const gltfLoader = new GLTFLoader();
 
@@ -32,6 +32,15 @@ export class Models {
         console.error("Error during enemy model loading.");
       }
     );
+
+    const towerGeometry = new THREE.BoxGeometry(
+      settings.TOWER_DEFAULT_SIZE,
+      settings.TOWER_DEFAULT_SIZE,
+      settings.TOWER_DEFAULT_SIZE
+    );
+    const towerMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
+    this.towerModel = new THREE.Mesh(towerGeometry, towerMaterial);
+
     const objLoader = new OBJLoader();
 
     objLoader.load(

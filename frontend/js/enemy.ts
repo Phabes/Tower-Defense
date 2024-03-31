@@ -34,6 +34,12 @@ export class Enemy extends THREE.Group {
     this.enemyFinishedPath = enemyFinishedPath;
     this.alive = false;
     this.active = true;
+
+    const models = Models.getInstance();
+    this.enemyContainer = models.getEnemyModelClone();
+    const enemyClips = models.getEnemyClips();
+    this.animation = new Animation(this.enemyContainer, enemyClips);
+    this.animation.setAnimation("Walk");
   }
 
   setAlive = (alive: boolean) => {
@@ -51,11 +57,7 @@ export class Enemy extends THREE.Group {
       this.currentField.position.z
     );
 
-    const models = Models.getInstance();
-    this.enemyContainer = models.getEnemyModelClone();
-    const enemyClips = models.getEnemyClips();
-    this.animation = new Animation(this.enemyContainer, enemyClips);
-    this.animation.setAnimation("Walk");
+    this.animation.startAnimation();
 
     this.add(this.enemyContainer);
 

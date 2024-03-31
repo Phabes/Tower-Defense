@@ -5,7 +5,7 @@ export class Animation {
   private clock: THREE.Clock;
   private mixer: THREE.AnimationMixer;
   private clips: THREE.AnimationClip[];
-  private action: THREE.AnimationAction;
+  private action: THREE.AnimationAction | undefined;
 
   constructor(model: THREE.Object3D, clips: THREE.AnimationClip[]) {
     this.clock = new THREE.Clock();
@@ -19,6 +19,9 @@ export class Animation {
     }
     const clip = THREE.AnimationClip.findByName(this.clips, name);
     this.action = this.mixer.clipAction(clip);
+  };
+
+  startAnimation = () => {
     if (this.action) {
       this.action.setDuration(1 / settings.ENEMY_SPEED);
       this.action.play();
