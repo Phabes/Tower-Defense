@@ -14,21 +14,29 @@ import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
 import { Mailbox } from "./mailbox";
+import { Controls } from "./controls";
 
 export class Game {
   levels: Level[];
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
+  controls: Controls;
   player: Player;
   board: Board;
 
-  constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
+  constructor(
+    scene: THREE.Scene,
+    camera: Camera,
+    renderer: Renderer,
+    controls: Controls
+  ) {
     this.levels = [];
 
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
+    this.controls = controls;
     this.player = new Player(10, 500);
     this.board = new Board(this);
 
@@ -68,7 +76,7 @@ export class Game {
     this.board.setLevel(this.levels[index]);
     this.board.createBoard();
     this.camera.setCamera();
-    this.renderer.renderGame();
+    this.renderer.renderGame(this.scene, this.camera);
     this.board.prepareRound(0);
   };
 

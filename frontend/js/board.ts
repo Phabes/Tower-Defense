@@ -302,7 +302,7 @@ export class Board {
       }
     }
 
-    this.game.renderer.renderGame();
+    this.game.renderer.renderGame(this.game.scene, this.game.camera);
   };
 
   // createPlayerStats = () => {
