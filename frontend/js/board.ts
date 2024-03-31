@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { settings } from "./settings";
 import { Enemy } from "./enemy";
 import { Field } from "./fields/field";
@@ -23,10 +24,10 @@ export class Board {
   boardGroup: THREE.Group<THREE.Object3DEventMap>;
   enemiesGroup: THREE.Group<THREE.Object3DEventMap>;
   raycaster: THREE.Raycaster;
-  level: Level;
-  round: number;
-  animations: number;
-  spawnEnemiesInterval: NodeJS.Timeout;
+  level!: Level;
+  round!: number;
+  animations!: number;
+  spawnEnemiesInterval!: NodeJS.Timeout;
   selectedField: Field | null;
   // heart: THREE.Mesh<
   //   THREE.ExtrudeGeometry,
@@ -118,6 +119,7 @@ export class Board {
 
     this.setPath();
     boardClick(this.click);
+
     this.animate();
   };
 

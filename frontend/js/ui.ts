@@ -72,14 +72,13 @@ export const startButtonClick = (prepareGame: (index: number) => void) => {
     levelElement.css("display", "none");
     prepareGame(parseInt(value!.toString()));
   });
+  // button.trigger("click"); // to delete
 };
 
 export const showSelectLevel = () => {
   clearFieldOptions();
   const levelElement = $("#level");
   levelElement.css("display", "flex");
-  // const button = $("#startLevel"); // to delete
-  // button.trigger("click"); // to delete
 };
 
 export const setTimer = (time: number, startRound: () => void) => {

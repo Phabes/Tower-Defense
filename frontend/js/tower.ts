@@ -4,8 +4,9 @@ import { Building } from "./fields/building";
 import { Upgrade } from "./upgrade";
 import { Bullet } from "./bullet";
 import { Enemy } from "./enemy";
+import { Models } from "./models";
 
-export class Tower extends THREE.Mesh {
+export class Tower extends THREE.Group {
   building: Building;
   active: boolean;
   activeCost: Upgrade;
@@ -14,7 +15,9 @@ export class Tower extends THREE.Mesh {
   frequency: Upgrade;
   targets: Enemy[];
   bullets: Bullet[];
-  shooting: NodeJS.Timeout;
+  shooting: NodeJS.Timeout | undefined;
+  towerContainer: THREE.Object3D;
+  height: number;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
@@ -41,8 +44,9 @@ export class Tower extends THREE.Mesh {
     );
     this.targets = [];
     this.bullets = [];
+    this.towerContainer = Models.getInstance().getTowerModelClone();
+    this.height = this.calculateTowerHeight();
     this.upgradeBuilding = upgradeBuilding;
-    this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }
 
   setTargets = (targets: Enemy[]) => {
@@ -76,8 +80,7 @@ export class Tower extends THREE.Mesh {
 
   shoot = () => {
     const target = this.chooseTarget();
-    const height = settings.TOWER_DEFAULT_SIZE;
-    const positionZ = this.building.position.z + height / 2;
+    const positionZ = this.building.position.z + this.height;
     const bullet = new Bullet(target, this.power.value, positionZ);
     this.add(bullet);
     this.bullets.push(bullet);
@@ -104,14 +107,15 @@ export class Tower extends THREE.Mesh {
   };
 
   upgradeTower = () => {
-    const height = settings.TOWER_DEFAULT_SIZE;
+    this.towerContainer = Models.getInstance().getTowerModelClone();
+    this.height = this.calculateTowerHeight();
+    this.add(this.towerContainer);
+  };
 
-    this.geometry = new THREE.BoxGeometry(
-      settings.TOWER_DEFAULT_SIZE,
-      settings.TOWER_DEFAULT_SIZE,
-      height
-    );
-    this.position.setZ(this.building.position.z + height / 2);
+  calculateTowerHeight = () => {
+    const size = new THREE.Vector3();
+    new THREE.Box3().setFromObject(this.towerContainer).getSize(size);
+    return size.z;
   };
 
   inRange = (objectPosition3d: THREE.Vector3) => {

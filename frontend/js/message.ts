@@ -14,19 +14,15 @@ export class Message {
     this.message = message;
     this.variant = variant;
     this.ttl = ttl;
-    this.showMessage();
-  }
-
-  showMessage = () => {
+    this.status = "alive";
     this.messageElement = createMessage(this.message, this.variant);
 
     this.messageElement.on("click", this.messageClick);
 
-    this.status = "alive";
     this.messageInteval = setTimeout(() => {
       this.fadeMessage();
     }, this.ttl);
-  };
+  }
 
   fadeMessage = () => {
     clearInterval(this.messageInteval);
