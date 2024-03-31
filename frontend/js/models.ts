@@ -7,31 +7,13 @@ import { settings } from "./settings";
 export class Models {
   private static instance: Models;
   private enemyModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
-  private enemyClips: THREE.AnimationClip[];
   private towerModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
+  private texture: THREE.Texture | undefined;
 
   private constructor() {
-    this.enemyClips = [];
-
     const enemyGeometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
     const enemyMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     this.enemyModel = new THREE.Mesh(enemyGeometry, enemyMaterial);
-
-    const gltfLoader = new GLTFLoader();
-
-    gltfLoader.load(
-      "../assets/models/Enemy/cow.gltf",
-      (gltf) => {
-        this.enemyModel = gltf.scene;
-        this.enemyModel.scale.setScalar(12);
-        this.enemyModel.rotation.set(Math.PI / 2, Math.PI / 2, 0);
-        this.enemyClips = gltf.animations;
-      },
-      undefined,
-      (error) => {
-        console.error("Error during enemy model loading.");
-      }
-    );
 
     const towerGeometry = new THREE.BoxGeometry(
       settings.TOWER_DEFAULT_SIZE,
@@ -41,33 +23,45 @@ export class Models {
     const towerMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
     this.towerModel = new THREE.Mesh(towerGeometry, towerMaterial);
 
-    const objLoader = new OBJLoader();
+    this.loadModels()
+      .then((models) => {
+        [this.towerModel, this.texture, this.enemyModel] = models;
 
-    objLoader.load(
-      "../assets/models/Tower/Magic_tower.obj",
-      (obj) => {
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(
-          "../assets/models/Tower/Magic_Tower_LP_BaseColor_v1.png",
-          (texture) => {
-            this.towerModel = obj;
-            this.towerModel.scale.setScalar(12);
-            this.towerModel.rotation.set(Math.PI / 2, 0, 0);
-            obj.traverse(function (child) {
-              if (child instanceof THREE.Mesh) {
-                child.material.map = texture;
-                child.geometry.computeVertexNormals();
-              }
-            });
+        this.enemyModel.scale.setScalar(12);
+        this.enemyModel.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+
+        this.towerModel.scale.setScalar(12);
+        this.towerModel.rotation.set(Math.PI / 2, 0, 0);
+        this.towerModel.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.material.map = this.texture;
+            child.geometry.computeVertexNormals();
           }
-        );
-      },
-      undefined,
-      (error) => {
-        console.error("Error during enemy model loading.");
-      }
-    );
+        });
+      })
+      .catch(() => {
+        console.log("Error during models loading.");
+      });
   }
+
+  private loadModels = async () => {
+    const gltfLoader = new GLTFLoader();
+    const objLoader = new OBJLoader();
+    const textureLoader = new THREE.TextureLoader();
+
+    return await Promise.all([
+      objLoader.loadAsync("../assets/models/Tower/Magic_tower.obj"),
+      textureLoader.loadAsync(
+        "../assets/models/Tower/Magic_Tower_LP_BaseColor_v1.png"
+      ),
+      gltfLoader.loadAsync("../assets/models/Enemy/cow.gltf").then((res) => {
+        for (const animation of res.animations) {
+          res.scene.animations.push(animation);
+        }
+        return res.scene;
+      }),
+    ]);
+  };
 
   static getInstance = () => {
     if (!Models.instance) {
@@ -84,7 +78,7 @@ export class Models {
   };
 
   getEnemyClips = () => {
-    return this.enemyClips;
+    return this.enemyModel.animations;
   };
 
   getTowerModelClone = () => {
