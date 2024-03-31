@@ -47,6 +47,12 @@ body {
   align-items: center;
 }
 
+#createBoardSize{
+  display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 #levelSelect {
   height: min-content;
 }
@@ -192,4 +198,17 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+#creator{
+  display: none;
+  gap: 10px;
+}
+
+.panelContent{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
 }

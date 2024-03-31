@@ -5,9 +5,13 @@ import { Player } from "./player";
 import {
   refreshSelectOptions,
   removeLoading,
+  removeWelcome,
   showAlert,
   showSelectLevel,
   startButtonClick,
+
+  welcomeButtonsHandler,
+
   windowResize,
 } from "./ui";
 import { Camera } from "./camera";
@@ -32,11 +36,18 @@ export class Game {
     this.camera = camera;
     this.renderer = renderer;
     this.player = new Player(10, 500);
-    this.board = new Board(this);
 
-    this.retrieveLevels();
-    windowResize(camera, renderer);
+    welcomeButtonsHandler(this);
   }
+
+  startGame = () => {
+    removeWelcome();
+    this.board = new Board(this)
+    this.retrieveLevels();
+    windowResize(this.camera, this.renderer);
+  }
+
+  
 
   refreshLevelsSelection = () => {
     this.player.levelCompleted();

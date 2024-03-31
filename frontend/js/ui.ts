@@ -5,6 +5,7 @@ import { Tower } from "./tower";
 import { Player } from "./player";
 import { Upgrade } from "./upgrade";
 import { Variant } from "./types";
+import { Game } from "./game";
 
 export const getBoardElement = () => {
   return $("#board");
@@ -20,6 +21,10 @@ export const clearFieldOptions = () => {
 
 export const removeLoading = () => {
   $("#loading").remove();
+};
+
+export const removeWelcome = () => {
+  $("#welcome").remove();
 };
 
 export const windowResize = (camera: Camera, renderer: Renderer) => {
@@ -218,3 +223,34 @@ const getMessageColor = (variant: Variant) => {
     ? "#2a9117"
     : "#1616d9";
 };
+
+export const welcomeButtonsHandler = (game: Game) => {
+  const startButton = $("#startGame");
+  const createButton = $("#createLevel");
+
+  startButton.off("click");
+  startButton.on("click", () => {
+    game.startGame()
+
+  });
+}
+
+
+const showBoardSizePanel = () => {
+  const levelPanel = $("#level");
+  levelPanel.css("display", "none");
+  const creatorPanel = $("#creator");
+  creatorPanel.css("display", "block");
+
+  const button = $("#createBoard")
+  button.off("click");
+  button.on("click", () => {
+    const reg = /^\d+$/;
+    const width = $("#newBoardWidth").val();
+    const height = $("#newBoardHeight").val();
+    if (reg.test(width) && reg.test(height) ){
+      showBoardCreator(parseInt(width),parseInt(height));
+    }
+
+  });
+}
