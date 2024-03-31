@@ -27,7 +27,7 @@ export class Bullet extends THREE.Mesh {
   checkCollision = (towerPosition: THREE.Vector3) => {
     const boardBulletPosition = towerPosition.clone().add(this.position);
     const distance = this.target.position.distanceTo(boardBulletPosition);
-    return distance <= settings.ENEMY_SIZE;
+    return distance <= settings.ENEMY_HITBOX;
   };
 
   hitTarget = () => {

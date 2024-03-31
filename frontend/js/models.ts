@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils";
 import { settings } from "./settings";
 
@@ -7,6 +8,7 @@ export class Models {
   private static instance: Models;
   private enemyModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private enemyClips: THREE.AnimationClip[];
+  private towerModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
 
   private constructor() {
     this.enemyClips = [];
@@ -15,15 +17,41 @@ export class Models {
     const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     this.enemyModel = new THREE.Mesh(geometry, material);
 
-    const loader = new GLTFLoader();
+    const gltfLoader = new GLTFLoader();
 
-    loader.load(
-      "../assets/models/cow.gltf",
+    gltfLoader.load(
+      "../assets/models/Enemy/cow.gltf",
       (gltf) => {
         this.enemyModel = gltf.scene;
         this.enemyModel.scale.setScalar(12);
         this.enemyModel.rotation.set(Math.PI / 2, Math.PI / 2, 0);
         this.enemyClips = gltf.animations;
+      },
+      undefined,
+      (error) => {
+        console.error("Error during enemy model loading.");
+      }
+    );
+    const objLoader = new OBJLoader();
+
+    objLoader.load(
+      "../assets/models/Tower/Magic_tower.obj",
+      (obj) => {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+          "../assets/models/Tower/Magic_Tower_LP_BaseColor_v1.png",
+          (texture) => {
+            this.towerModel = obj;
+            this.towerModel.scale.setScalar(12);
+            this.towerModel.rotation.set(Math.PI / 2, 0, 0);
+            obj.traverse(function (child) {
+              if (child instanceof THREE.Mesh) {
+                child.material.map = texture;
+                child.geometry.computeVertexNormals();
+              }
+            });
+          }
+        );
       },
       undefined,
       (error) => {
@@ -48,5 +76,11 @@ export class Models {
 
   getEnemyClips = () => {
     return this.enemyClips;
+  };
+
+  getTowerModelClone = () => {
+    const container = new THREE.Object3D();
+    container.add(SkeletonUtils.clone(this.towerModel));
+    return container;
   };
 }

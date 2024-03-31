@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { settings } from "./settings";
 
 export class Animation {
   private clock: THREE.Clock;
@@ -6,10 +7,7 @@ export class Animation {
   private clips: THREE.AnimationClip[];
   private action: THREE.AnimationAction;
 
-  constructor(
-    model: THREE.Object3D<THREE.Object3DEventMap>,
-    clips: THREE.AnimationClip[]
-  ) {
+  constructor(model: THREE.Object3D, clips: THREE.AnimationClip[]) {
     this.clock = new THREE.Clock();
     this.mixer = new THREE.AnimationMixer(model);
     this.clips = clips;
@@ -22,6 +20,7 @@ export class Animation {
     const clip = THREE.AnimationClip.findByName(this.clips, name);
     this.action = this.mixer.clipAction(clip);
     if (this.action) {
+      this.action.setDuration(1 / settings.ENEMY_SPEED);
       this.action.play();
     }
   };
