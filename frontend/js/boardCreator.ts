@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
-import { boardClick, boardMouseMove, getBoardElement } from "./ui";
+import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType } from "./ui";
 import { Game } from "./game";
 import { Board } from "./board";
 import { settings } from "./settings";
+import { Path } from "./fields/path";
+import { Building } from "./fields/building";
 
 export class BoardCreator extends Board {
 
@@ -14,6 +16,61 @@ export class BoardCreator extends Board {
     this.width=width;
     this.height=height;
   }
+
+  onHover = (event: JQuery.MouseEnterEvent) => {
+    const pointer = this.getMouseVector2(event);
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Field) {
+          if ( object != this.hoveredField) {
+            this.hoveredField?.colorField();
+            this.hoveredField = object;
+            object.highlight();
+          }
+        }
+      }
+    }
+  }
+
+  click = (event: JQuery.ClickEvent) => {
+    const pointer = this.getMouseVector2(event);
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Field){
+          const coord = object.getCoords()
+          this.boardGroup.remove(this.fields[coord.y][coord.x].elementsOnField)
+          switch (getFieldPickerType()){
+            case "path":
+              this.fields[coord.y][coord.x] = new Path(coord, "path")
+              break;
+            case "building":
+              this.fields[coord.y][coord.x] = new Building(coord, "building")
+              break;
+            case "grass":
+              this.fields[coord.y][coord.x] = new Field(coord, "grass")
+              break;
+            default:
+              console.log("Non");
+              break;
+          }
+          this.boardGroup.add(this.fields[coord.y][coord.x].createField(this.width))
+        }
+      }
+    }
+  };
+
+  
 
   createBoard = () => {
     console.log("Control")

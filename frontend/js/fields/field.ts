@@ -78,5 +78,8 @@ export class Field extends THREE.Mesh implements FieldInterface {
       color: 0x42daf5
     });
   }
+  getCoords = () => {
+    return this.coord
+  }
 
 }

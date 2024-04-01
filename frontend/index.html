@@ -53,7 +53,7 @@
         </div>
         <div class="fullPanel" id="loading"><span id="loader"></span></div>
         <div class="fullPanel" id="creator">
-          <div class="panelContent">
+          <div id="boardSize" class="panelContent">
             <table>
               <tr>
                 <td>Width:</td>
@@ -65,6 +65,23 @@
               </tr>
             </table>
             <div class="gameButton" id="createBoard">CREATE BOARD</div>
+          </div>
+          <div id="boardFields" class="panelContent">
+            <table>
+              <tr id="pathFieldPicker">
+                <td class="selectedFieldPicker"><input type="radio" id="pathFieldPickerRB" name="fieldPicker" value="path" checked></td>
+                <td>PATH</td>
+              </tr>
+              <tr id="towerFieldPicker">
+                <td><input type="radio" id="towerFieldPickerRB" name="fieldPicker" value="building"></td>
+                <td>TOWER</td>
+              </tr>
+              <tr id="grassFieldPicker">
+                <td><input type="radio" id="grassFieldPickerRB"  name="fieldPicker" value="grass"></td>
+                <td>GRASS</td>
+              </tr>
+            </table>
+
           </div>
         </div>
         <div class="fullPanel" id="welcome">

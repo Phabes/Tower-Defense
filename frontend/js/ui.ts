@@ -258,6 +258,43 @@ const showBoardSizePanel = (game: Game) => {
     const height = $("#newBoardHeight").val() as string;
     if (reg.test(width) && reg.test(height)) {
       game.startLevelCreator(parseInt(width), parseInt(height));
+      showCreatorFieldsPanel()
     }
   });
+}
+
+const showCreatorFieldsPanel = ()  => {
+  $("#boardSize").remove();
+  $("#boardFields").css({"display":"block"});
+
+  const pathFieldPicker = $("#pathFieldPicker td:first-child")
+  const towerFieldPicker = $("#towerFieldPicker td:first-child");
+  const grassFieldPicker = $("#grassFieldPicker td:first-child");
+
+  pathFieldPicker.off("click");
+  towerFieldPicker.off("click");
+  grassFieldPicker.off("click");
+
+  pathFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker")
+    pathFieldPicker.addClass("selectedFieldPicker")
+    $("#pathFieldPickerRB").prop("checked",true);
+  })
+
+  towerFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker");
+    towerFieldPicker.addClass("selectedFieldPicker");
+    $("#towerFieldPickerRB").prop("checked", true);
+
+  });
+
+  grassFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker");
+    grassFieldPicker.addClass("selectedFieldPicker");
+    $("#grassFieldPickerRB").prop("checked", true);
+  });
+}
+
+export const getFieldPickerType = () => {
+  return $("input[name='fieldPicker']:checked").val();
 }
