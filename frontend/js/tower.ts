@@ -18,6 +18,7 @@ export class Tower extends THREE.Group {
   shooting: NodeJS.Timeout | undefined;
   towerContainer: THREE.Object3D;
   height: number;
+  rangeMesh: THREE.Mesh;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
@@ -28,10 +29,10 @@ export class Tower extends THREE.Group {
     this.range = new Upgrade(
       "Range",
       2,
-      settings.FIELD_SIZE + settings.FIELD_SIZE / 2,
+      settings.FIELD_SIZE / 2 + settings.FIELD_SIZE + settings.SPACE_BETWEEN,
       300,
-      1,
-      this.rebuildTower
+      settings.FIELD_SIZE + settings.SPACE_BETWEEN,
+      this.rangeUpgrade
     );
     this.power = new Upgrade("Power", 2, 50, 250, 50, this.rebuildTower);
     this.frequency = new Upgrade(
@@ -45,9 +46,41 @@ export class Tower extends THREE.Group {
     this.targets = [];
     this.bullets = [];
     this.towerContainer = Models.getInstance().getTowerModelClone();
+    this.rangeMesh = this.createRangeMesh();
+    this.towerContainer.add(this.rangeMesh);
     this.height = this.calculateTowerHeight();
     this.upgradeBuilding = upgradeBuilding;
   }
+
+  createRangeMesh = () => {
+    const geometry = new THREE.CircleGeometry(this.range.value, 64);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.4,
+    });
+
+    const rangeMesh = new THREE.Mesh(geometry, material);
+    rangeMesh.position.set(0, 0, 5);
+    rangeMesh.visible = false;
+    return rangeMesh;
+  };
+
+  hovered = (hover: boolean) => {
+    this.rangeMesh.visible = hover;
+  };
+
+  rangeUpgrade = () => {
+    for (let i = this.towerContainer.children.length - 1; i >= 0; i--) {
+      if (this.towerContainer.children[i] === this.rangeMesh) {
+        this.towerContainer.children.splice(i, 1);
+      }
+    }
+    this.rangeMesh = this.createRangeMesh();
+    this.towerContainer.add(this.rangeMesh);
+    this.rebuildTower();
+  };
 
   setTargets = (targets: Enemy[]) => {
     this.targets = targets;
@@ -107,7 +140,7 @@ export class Tower extends THREE.Group {
   };
 
   upgradeTower = () => {
-    this.towerContainer = Models.getInstance().getTowerModelClone();
+    // Add tower modification
     this.height = this.calculateTowerHeight();
     this.add(this.towerContainer);
   };
