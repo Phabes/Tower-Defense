@@ -26,4 +26,12 @@ export class Building extends Field {
   upgradeBuilding = () => {
     this.addFieldElement(this.tower);
   };
+
+  fieldHover = () => {
+    if (this.tower.active) {
+      this.tower.hovered(true);
+    }
+  };
+
+  fieldLeave = () => {};
 }

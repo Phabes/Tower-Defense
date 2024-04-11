@@ -13,6 +13,7 @@ import {
   getBoardElement,
   setTimer,
   showPlayerStats,
+  towerHover,
 } from "./ui";
 import { Tower } from "./tower";
 
@@ -79,6 +80,31 @@ export class Board {
     }
   };
 
+  hover = (event: JQuery.MouseMoveEvent) => {
+    const pointer = new THREE.Vector2();
+    const boardElement = getBoardElement();
+    pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
+    pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    for (const tower of this.towers) {
+      if (tower.active) {
+        tower.hovered(false);
+      }
+    }
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Building) {
+          object.fieldHover();
+        }
+      }
+    }
+  };
+
   setLevel = (level: Level) => {
     this.level = level;
   };
@@ -119,6 +145,7 @@ export class Board {
 
     this.setPath();
     boardClick(this.click);
+    towerHover(this.hover);
 
     this.animate();
   };
@@ -280,6 +307,7 @@ export class Board {
 
     for (const tower of this.towers) {
       if (tower.active) {
+        // tower.rangeMesh.visible = false;
         tower.clearBullets();
         for (const bullet of tower.bullets) {
           bullet.move(tower.building.position);
