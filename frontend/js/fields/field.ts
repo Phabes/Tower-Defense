@@ -13,6 +13,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
   coord: Coord;
   type: Surface;
   nextFields: Field[];
+  color:string;
   elementsOnField: THREE.Group;
   isSelected:boolean = false;
 
@@ -21,11 +22,12 @@ export class Field extends THREE.Mesh implements FieldInterface {
     this.coord = coord;
     this.type = type;
     this.elementsOnField = new THREE.Group();
+    this.color = this.isSelected ? "#ff00ff" : "#26d46e"
   }
 
   colorField = () => {
     this.material = new THREE.MeshBasicMaterial({
-      color: this.isSelected ? 0xff00ff : 0x26d46e,
+      color: this.color,
     });
   };
 
@@ -74,10 +76,9 @@ export class Field extends THREE.Mesh implements FieldInterface {
   };
 
   highlight = () => {
-    this.material = new THREE.MeshBasicMaterial({
-      color: 0x42daf5
-    });
+    (this.material as THREE.MeshBasicMaterial).color.set("#42daf5")
   }
+  
   getCoords = () => {
     return this.coord
   }

@@ -1,20 +1,29 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
-import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType } from "./ui";
+import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType, acceptCreatedLevel, showAlert,alertPopup } from "./ui";
 import { Game } from "./game";
 import { Board } from "./board";
 import { settings } from "./settings";
 import { Path } from "./fields/path";
 import { Building } from "./fields/building";
+import { Coord } from "./types";
 
 export class BoardCreator extends Board {
 
   width:number;
   height:number;
+  onlyPath:boolean = false;
+  choosingStart:boolean = false;
+  startCoords:Coord;
+  choosingEnd:boolean = false;
+  endCoords:Coord;
+  lastChoosenField:Path | undefined;
+
   constructor(game: Game, width: number, height: number) {
     super(game)
     this.width=width;
     this.height=height;
+    acceptCreatedLevel(this)
   }
 
   onHover = (event: JQuery.MouseEnterEvent) => {
@@ -26,8 +35,14 @@ export class BoardCreator extends Board {
     if (intersects.length > 0) {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
-        if (object instanceof Field) {
+        if (!this.onlyPath && object instanceof Field) {
           if ( object != this.hoveredField) {
+            this.hoveredField?.colorField();
+            this.hoveredField = object;
+            object.highlight();
+          }
+        } else if (this.onlyPath && object instanceof Path){
+          if (object != this.hoveredField) {
             this.hoveredField?.colorField();
             this.hoveredField = object;
             object.highlight();
@@ -36,7 +51,7 @@ export class BoardCreator extends Board {
       }
     }
   }
-
+  
   click = (event: JQuery.ClickEvent) => {
     const pointer = this.getMouseVector2(event);
     this.raycaster.setFromCamera(pointer, this.game.camera);
@@ -47,7 +62,7 @@ export class BoardCreator extends Board {
     if (intersects.length > 0) {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
-        if (object instanceof Field){
+        if (object instanceof Field && !this.onlyPath){
           const coord = object.getCoords()
           this.boardGroup.remove(this.fields[coord.y][coord.x].elementsOnField)
           switch (getFieldPickerType()){
@@ -65,6 +80,21 @@ export class BoardCreator extends Board {
               break;
           }
           this.boardGroup.add(this.fields[coord.y][coord.x].createField(this.width))
+        } else if (this.onlyPath && object instanceof Path){
+          const coord = object.getCoords();
+          if(this.choosingStart){
+            if (this.lastChoosenField != undefined)
+              this.lastChoosenField.changeColor("default");
+            this.lastChoosenField = object;
+            object.changeColor("start");
+            this.startCoords = coord;
+          }else if(this.choosingEnd && this.startCoords != coord){
+            if (this.lastChoosenField != undefined)
+              this.lastChoosenField.changeColor("default");
+            this.lastChoosenField = object;
+            object.changeColor("end");
+            this.endCoords = coord;
+          }
         }
       }
     }
@@ -114,5 +144,33 @@ export class BoardCreator extends Board {
     this.boardGroup.clear();
     this.fields = [];
   };
+
+  acceptBoard = () =>{
+    this.onlyPath = true;
+    this.choosingStart = true;
+  }
+
+  acceptStartField = ():boolean=>{
+    if(!this.startCoords){
+      alertPopup("Choose starting field.")
+      return false;
+    }
+    this.choosingStart = false;
+    this.choosingEnd = true;
+    this.lastChoosenField = undefined;
+    return true;
+  }
+  
+  acceptEndField = ():boolean => {
+    if (!this.endCoords) {
+      alertPopup("Choose end field.");
+      return false;
+    }
+    this.choosingStart = false;
+    this.choosingEnd = false;
+    this.lastChoosenField = undefined;
+    return true;
+  }
+
 
 }

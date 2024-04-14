@@ -66,7 +66,8 @@ export class Game {
 
   retrieveLevels = () => {
     getLevels().done((res) => {
-      const levels = res.levels;
+
+      const levels = JSON.parse(res).levels;
       this.levels = levels;
       removeLoading();
       this.refreshLevelsSelection();

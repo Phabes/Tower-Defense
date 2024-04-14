@@ -6,6 +6,8 @@ import { Player } from "./player";
 import { Upgrade } from "./upgrade";
 import { Variant } from "./types";
 import { Game } from "./game";
+import { Board } from "./board";
+import { BoardCreator } from "./boardCreator";
 
 export const getBoardElement = () => {
   return $("#board");
@@ -265,7 +267,7 @@ const showBoardSizePanel = (game: Game) => {
 
 const showCreatorFieldsPanel = ()  => {
   $("#boardSize").remove();
-  $("#boardFields").css({"display":"block"});
+  $("#boardFields").css({"display":"flex"});
 
   const pathFieldPicker = $("#pathFieldPicker td:first-child")
   const towerFieldPicker = $("#towerFieldPicker td:first-child");
@@ -298,3 +300,37 @@ const showCreatorFieldsPanel = ()  => {
 export const getFieldPickerType = () => {
   return $("input[name='fieldPicker']:checked").val();
 }
+
+export const acceptCreatedLevel = (board: BoardCreator) =>{
+  const acceptBoardButton = $("#acceptBoard");
+  const acceptStartFieldButton = $("#acceptStartField");
+  const acceptEndFieldButton = $("#acceptEndField");
+
+  acceptBoardButton.off("click");
+  acceptBoardButton.on("click",function(){
+    board.acceptBoard();
+    $("#boardFields").hide();
+  })
+
+  acceptStartFieldButton.off("click");
+  acceptStartFieldButton.on("click", function () {
+    const  isValid = board.acceptStartField();
+    if (isValid)
+      $("#startFieldPicker").hide();
+
+  });
+
+  acceptEndFieldButton.off("click");
+  acceptEndFieldButton.on("click", function () {
+    const isValid = board.acceptEndField();
+    if (isValid)
+      $("#endFieldPicker").hide();
+  });
+}
+
+export const alertPopup =(message:string)=>{
+  alert(message)
+}
+
+
+
