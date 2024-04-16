@@ -6,7 +6,8 @@ export class Path extends Field {
   typeColors = {
     "default":"#edea3e",
     "start":"#f5ad42",
-    "end":"#4242f5"
+    "end":"#4242f5",
+    "highlight":"#42daf5"
   }
   constructor(coord: Coord, type: Surface) {
     super(coord, type);
@@ -18,7 +19,7 @@ export class Path extends Field {
       color: this.color,
     });
   };
-  changeColor = (type: "default" | "start" | "end") => {
+  changeColor = (type: "default" | "start" | "end" | "highlight") => {
     this.color = this.typeColors[type];
     (this.material as THREE.MeshBasicMaterial).color.set(this.color);
   }
