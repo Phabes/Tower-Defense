@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stylized Magic Tower
+* source:	https://sketchfab.com/3d-models/stylized-magic-tower-5c98a209e3b54912a87ef1d34f7b4be6
+* author:	Alex.Latigun (https://sketchfab.com/Alex.Latigun)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stylized Magic Tower" (https://sketchfab.com/3d-models/stylized-magic-tower-5c98a209e3b54912a87ef1d34f7b4be6) by Alex.Latigun (https://sketchfab.com/Alex.Latigun) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

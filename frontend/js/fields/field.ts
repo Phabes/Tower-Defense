@@ -2,11 +2,13 @@ import * as THREE from "three";
 import { Coord, Surface } from "../types";
 import { settings } from "../settings";
 import { Player } from "../player";
+import { Models } from "../models";
 
 interface FieldInterface {
   colorField(selected: boolean): void;
   showPanel(show: boolean, player: Player): void;
   addFieldElement(element: THREE.Mesh): void;
+  createField(mapSizeY: number): THREE.Group<THREE.Object3DEventMap>;
 }
 
 export class Field extends THREE.Mesh implements FieldInterface {
@@ -25,7 +27,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
 
   colorField = (selected: boolean) => {
     this.material = new THREE.MeshBasicMaterial({
-      color: selected ? 0xff00ff : 0x26d46e,
+      map: Models.getInstance().getGrassTexture(),
     });
   };
 
@@ -62,6 +64,21 @@ export class Field extends THREE.Mesh implements FieldInterface {
       0
     );
     this.elementsOnField.add(this);
+
+    const createBush = Math.random();
+    if (createBush < 0.5) {
+      const grass = Models.getInstance().getTreeModelClone();
+      grass.position.set(
+        this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        (mapSizeY - this.coord.y - 1) *
+          (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        5
+      );
+      this.elementsOnField.add(grass);
+    }
+
     return this.elementsOnField;
   };
 }

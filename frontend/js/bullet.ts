@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { Enemy } from "./enemy";
 import { settings } from "./settings";
+import { Models } from "./models";
 
-export class Bullet extends THREE.Mesh {
+export class Bullet extends THREE.Object3D {
   target: Enemy;
   damage: number;
 
@@ -10,8 +11,7 @@ export class Bullet extends THREE.Mesh {
     super();
     this.target = target;
     this.damage = damage;
-    this.material = new THREE.MeshBasicMaterial({ color: 0x34deeb });
-    this.geometry = new THREE.SphereGeometry(settings.BULLET_SIZE);
+    this.add(Models.getInstance().getBulletClone());
     this.position.setZ(startingPositionZ);
   }
 
