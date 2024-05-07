@@ -4,7 +4,6 @@ import { Board } from "./board";
 import { Player } from "./player";
 import {
   refreshSelectOptions,
-  removeLoading,
   showAlert,
   showSelectLevel,
   startButtonClick,
