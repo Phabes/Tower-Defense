@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils";
 import { settings } from "./settings";
 
@@ -8,7 +7,10 @@ export class Models {
   private static instance: Models;
   private enemyModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private towerModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
-  private texture: THREE.Texture | undefined;
+  private treeModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
+  private bulletModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
+  private grassTexture: THREE.Texture | undefined;
+  private pathTexture: THREE.Texture | undefined;
 
   private constructor() {
     const enemyGeometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
@@ -23,21 +25,35 @@ export class Models {
     const towerMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
     this.towerModel = new THREE.Mesh(towerGeometry, towerMaterial);
 
+    const bushGeometry = new THREE.SphereGeometry(settings.ENEMY_SIZE / 2);
+    const bushMaterial = new THREE.MeshBasicMaterial({ color: 0x26d46e });
+    this.treeModel = new THREE.Mesh(bushGeometry, bushMaterial);
+
+    const bulletGeometry = new THREE.SphereGeometry(settings.BULLET_SIZE);
+    const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0x34deeb });
+    this.bulletModel = new THREE.Mesh(bulletGeometry, bulletMaterial);
+
     this.loadModels()
       .then((models) => {
-        [this.towerModel, this.texture, this.enemyModel] = models;
+        [
+          this.towerModel,
+          this.enemyModel,
+          this.treeModel,
+          this.bulletModel,
+          this.grassTexture,
+          this.pathTexture,
+        ] = models;
 
         this.enemyModel.scale.setScalar(12);
         this.enemyModel.rotation.set(Math.PI / 2, Math.PI / 2, 0);
 
         this.towerModel.scale.setScalar(12);
         this.towerModel.rotation.set(Math.PI / 2, 0, 0);
-        this.towerModel.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            child.material.map = this.texture;
-            child.geometry.computeVertexNormals();
-          }
-        });
+
+        this.treeModel.rotation.set(Math.PI / 2, 0, 0);
+
+        this.bulletModel.scale.setScalar(2);
+        this.bulletModel.rotation.set(Math.PI / 2, 0, 0);
       })
       .catch(() => {
         console.log("Error during models loading.");
@@ -46,20 +62,28 @@ export class Models {
 
   private loadModels = async () => {
     const gltfLoader = new GLTFLoader();
-    const objLoader = new OBJLoader();
     const textureLoader = new THREE.TextureLoader();
 
     return await Promise.all([
-      objLoader.loadAsync("../assets/models/Tower/Magic_tower.obj"),
-      textureLoader.loadAsync(
-        "../assets/models/Tower/Magic_Tower_LP_BaseColor_v1.png"
-      ),
+      gltfLoader.loadAsync("../assets/models/Tower/scene.gltf").then((res) => {
+        return res.scene;
+      }),
       gltfLoader.loadAsync("../assets/models/Enemy/cow.gltf").then((res) => {
         for (const animation of res.animations) {
           res.scene.animations.push(animation);
         }
         return res.scene;
       }),
+      gltfLoader.loadAsync("../assets/models/Tree/scene.gltf").then((res) => {
+        return res.scene;
+      }),
+      gltfLoader
+        .loadAsync("../assets/models/Fireball/scene.gltf")
+        .then((res) => {
+          return res.scene;
+        }),
+      textureLoader.loadAsync("../assets/images/grass.jpg"),
+      textureLoader.loadAsync("../assets/images/path.jpg"),
     ]);
   };
 
@@ -85,5 +109,26 @@ export class Models {
     const container = new THREE.Object3D();
     container.add(SkeletonUtils.clone(this.towerModel));
     return container;
+  };
+
+  getTreeModelClone = () => {
+    const container = new THREE.Object3D();
+    const scalar = Math.floor(Math.random() * (50 - 30 + 1)) + 30;
+    const bushCopy = SkeletonUtils.clone(this.treeModel);
+    bushCopy.scale.setScalar(scalar);
+    container.add(bushCopy);
+    return container;
+  };
+
+  getBulletClone = () => {
+    return SkeletonUtils.clone(this.bulletModel);
+  };
+
+  getGrassTexture = () => {
+    return this.grassTexture;
+  };
+
+  getPathTexture = () => {
+    return this.pathTexture;
   };
 }

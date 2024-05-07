@@ -4,6 +4,8 @@ import { Coord, Surface } from "../types";
 import { Tower } from "../tower";
 import { showTowerPanel } from "../ui";
 import { Player } from "../player";
+import { settings } from "../settings";
+import { Models } from "../models";
 
 export class Building extends Field {
   tower: Tower;
@@ -15,7 +17,7 @@ export class Building extends Field {
 
   colorField = (selected: boolean) => {
     this.material = new THREE.MeshBasicMaterial({
-      color: selected ? 0xff00ff : 0xeb4634,
+      color: selected ? 0x93d4ed : 0xeb7063,
     });
   };
 
@@ -34,4 +36,22 @@ export class Building extends Field {
   };
 
   fieldLeave = () => {};
+
+  createField = (mapSizeY: number) => {
+    this.geometry = new THREE.PlaneGeometry(
+      settings.FIELD_SIZE,
+      settings.FIELD_SIZE
+    );
+    this.colorField(false);
+    this.position.set(
+      this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+        settings.FIELD_SIZE / 2,
+      (mapSizeY - this.coord.y - 1) *
+        (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+        settings.FIELD_SIZE / 2,
+      0
+    );
+    this.elementsOnField.add(this);
+    return this.elementsOnField;
+  };
 }
