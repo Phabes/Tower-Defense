@@ -4,7 +4,6 @@ import { Board } from "./board";
 import { Player } from "./player";
 import {
   refreshSelectOptions,
-  removeLoading,
   showAlert,
   showSelectLevel,
   startButtonClick,
@@ -15,6 +14,7 @@ import { Renderer } from "./renderer";
 import { Level } from "./types";
 import { Mailbox } from "./mailbox";
 import { Controls } from "./controls";
+import { Loading } from "./loading";
 
 export class Game {
   levels: Level[];
@@ -51,13 +51,17 @@ export class Game {
   };
 
   retrieveLevels = () => {
-    getLevels().done((res) => {
-      const levels = res.levels;
-      this.levels = levels;
-      removeLoading();
-      this.refreshLevelsSelection();
-      startButtonClick(this.prepareGame);
-    });
+    getLevels()
+      .done((res) => {
+        const levels = res.levels;
+        this.levels = levels;
+        this.refreshLevelsSelection();
+        Loading.getInstance().setLevelsLoaded(true);
+        startButtonClick(this.prepareGame);
+      })
+      .catch(() => {
+        Loading.getInstance().setLevelsError(true);
+      });
   };
 
   levelNotCompleted = () => {

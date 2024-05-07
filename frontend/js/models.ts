@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils";
 import { settings } from "./settings";
+import { Loading } from "./loading";
 
 export class Models {
   private static instance: Models;
@@ -54,11 +55,21 @@ export class Models {
 
         this.bulletModel.scale.setScalar(2);
         this.bulletModel.rotation.set(Math.PI / 2, 0, 0);
+
+        Loading.getInstance().setModelsLoaded(true);
       })
       .catch(() => {
-        console.log("Error during models loading.");
+        Loading.getInstance().setModelsError(true);
       });
   }
+
+  static getInstance = () => {
+    if (!Models.instance) {
+      Models.instance = new Models();
+    }
+
+    return Models.instance;
+  };
 
   private loadModels = async () => {
     const gltfLoader = new GLTFLoader();
@@ -85,14 +96,6 @@ export class Models {
       textureLoader.loadAsync("../assets/images/grass.jpg"),
       textureLoader.loadAsync("../assets/images/path.jpg"),
     ]);
-  };
-
-  static getInstance = () => {
-    if (!Models.instance) {
-      Models.instance = new Models();
-    }
-
-    return Models.instance;
   };
 
   getEnemyModelClone = () => {

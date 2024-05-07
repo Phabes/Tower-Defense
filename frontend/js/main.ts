@@ -6,8 +6,12 @@ import { Renderer } from "./renderer";
 import { Models } from "./models";
 import { Light } from "./light";
 import { Controls } from "./controls";
+import { Loading } from "./loading";
 
 $(document).ready(function () {
+  Loading.getInstance().setLoadingStatus();
+  Models.getInstance();
+
   const renderer = new Renderer();
   const camera = new Camera();
   const light = new Light();
@@ -16,8 +20,6 @@ $(document).ready(function () {
 
   scene.add(camera);
   scene.add(light);
-
-  Models.getInstance();
 
   new Game(scene, camera, renderer, controls);
 });
