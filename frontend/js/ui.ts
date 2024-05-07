@@ -17,6 +17,14 @@ export const clearFieldOptions = () => {
   $("#fieldButtons").empty();
 };
 
+export const setLoadingMessage = (message: string) => {
+  $("#loadingMessage").text(message);
+};
+
+export const setErrorMessage = (message: string) => {
+  $("#errorMessage").text(message);
+};
+
 export const removeLoading = () => {
   $("#loading").remove();
 };
