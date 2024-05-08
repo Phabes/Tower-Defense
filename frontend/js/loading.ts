@@ -56,10 +56,14 @@ export class Loading {
     setLoadingMessage(message);
   };
 
-  checkRemoveLoading = () => {
+  private checkRemoveLoading = () => {
     if (this.levelsLoaded.loaded && this.modelsLoaded.loaded) {
       removeLoading();
     }
+  };
+
+  canStartGame = () => {
+    return this.levelsLoaded.loaded && this.modelsLoaded.loaded;
   };
 
   setLevelsLoaded = (loaded: boolean) => {

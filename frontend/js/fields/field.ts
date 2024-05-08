@@ -65,8 +65,10 @@ export class Field extends THREE.Mesh implements FieldInterface {
     );
     this.elementsOnField.add(this);
 
-    const createBush = Math.random();
-    if (createBush < 0.5) {
+    const createTree = Math.random();
+    const createHouse = Math.random();
+
+    if (createTree < settings.TREE_CREATION_CHANCE) {
       const grass = Models.getInstance().getTreeModelClone();
       grass.position.set(
         this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
@@ -74,9 +76,20 @@ export class Field extends THREE.Mesh implements FieldInterface {
         (mapSizeY - this.coord.y - 1) *
           (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
           settings.FIELD_SIZE / 2,
-        5
+        0
       );
       this.elementsOnField.add(grass);
+    } else if (createHouse < settings.HOUSE_CREATION_CHANCE) {
+      const house = Models.getInstance().getHouseModelClone();
+      house.position.set(
+        this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        (mapSizeY - this.coord.y - 1) *
+          (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        0
+      );
+      this.elementsOnField.add(house);
     }
 
     return this.elementsOnField;

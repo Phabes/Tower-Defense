@@ -1,11 +1,11 @@
 Model Information:
-* title:	Anime tree 2
-* source:	https://sketchfab.com/3d-models/anime-tree-2-2453d573813f41a18c162f58e3efba12
-* author:	Digital screen official (https://sketchfab.com/ck212575)
+* title:	Tree
+* source:	https://sketchfab.com/3d-models/tree-ea5e6ed7f9d6445ba69589d503e8cebf
+* author:	BaptisteBerard (https://sketchfab.com/BaptisteBerard)
 
 Model License:
 * license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 * requirements:	Author must be credited. Commercial use is allowed.
 
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
-This work is based on "Anime tree 2" (https://sketchfab.com/3d-models/anime-tree-2-2453d573813f41a18c162f58e3efba12) by Digital screen official (https://sketchfab.com/ck212575) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Tree" (https://sketchfab.com/3d-models/tree-ea5e6ed7f9d6445ba69589d503e8cebf) by BaptisteBerard (https://sketchfab.com/BaptisteBerard) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
