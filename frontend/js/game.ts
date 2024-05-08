@@ -42,6 +42,7 @@ export class Game {
 
     this.retrieveLevels();
     windowResize(camera, renderer);
+    startButtonClick(this.prepareGame);
   }
 
   refreshLevelsSelection = () => {
@@ -57,7 +58,6 @@ export class Game {
         this.levels = levels;
         this.refreshLevelsSelection();
         Loading.getInstance().setLevelsLoaded(true);
-        startButtonClick(this.prepareGame);
       })
       .catch(() => {
         Loading.getInstance().setLevelsError(true);

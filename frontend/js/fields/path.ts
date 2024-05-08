@@ -3,6 +3,7 @@ import { Field } from "./field";
 import { Coord, Surface } from "../types";
 import { settings } from "../settings";
 import { Models } from "../models";
+import { Loading } from "../loading";
 
 export class Path extends Field {
   constructor(coord: Coord, type: Surface) {
@@ -10,8 +11,13 @@ export class Path extends Field {
   }
 
   colorField = (selected: boolean) => {
+    const models = Models.getInstance();
+    const modelsLoaded = models.getModelsLoadedStatus();
+    const color = selected ? 0xff00ff : 0xedea3e;
+
     this.material = new THREE.MeshBasicMaterial({
-      map: Models.getInstance().getPathTexture(),
+      map: modelsLoaded ? models.getPathTexture() : undefined,
+      color: !modelsLoaded ? color : undefined,
     });
   };
 

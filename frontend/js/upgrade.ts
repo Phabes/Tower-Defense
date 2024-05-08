@@ -28,6 +28,10 @@ export class Upgrade {
     this.levelUpCallback = levelUpCallback;
   }
 
+  getUpgradeStatus = () => {
+    return `${this.level}/${this.maxLevel}`;
+  };
+
   canLevelUp = () => {
     return this.level < this.maxLevel;
   };
