@@ -3,6 +3,7 @@ import { Coord, Surface } from "../types";
 import { settings } from "../settings";
 import { Player } from "../player";
 import { Models } from "../models";
+import { Loading } from "../loading";
 
 interface FieldInterface {
   colorField(selected: boolean): void;
@@ -26,8 +27,13 @@ export class Field extends THREE.Mesh implements FieldInterface {
   }
 
   colorField = (selected: boolean) => {
+    const models = Models.getInstance();
+    const modelsLoaded = models.getModelsLoadedStatus();
+    const color = selected ? 0xff00ff : 0x26d46e;
+
     this.material = new THREE.MeshBasicMaterial({
-      map: Models.getInstance().getGrassTexture(),
+      map: modelsLoaded ? models.getGrassTexture() : undefined,
+      color: !modelsLoaded ? color : undefined,
     });
   };
 
