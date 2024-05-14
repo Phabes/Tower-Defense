@@ -2,11 +2,14 @@ import * as THREE from "three";
 import { Coord, Surface } from "../types";
 import { settings } from "../settings";
 import { Player } from "../player";
+import { Models } from "../models";
+import { Loading } from "../loading";
 
 interface FieldInterface {
   colorField(): void;
   showPanel(show: boolean, player: Player): void;
   addFieldElement(element: THREE.Mesh): void;
+  createField(mapSizeY: number): THREE.Group<THREE.Object3DEventMap>;
 }
 
 export class Field extends THREE.Mesh implements FieldInterface {
@@ -21,13 +24,19 @@ export class Field extends THREE.Mesh implements FieldInterface {
     super();
     this.coord = coord;
     this.type = type;
+    this.nextFields = [];
     this.elementsOnField = new THREE.Group();
     this.color = this.isSelected ? "#ff00ff" : "#26d46e"
   }
 
-  colorField = () => {
+  colorField = (selected: boolean) => {
+    const models = Models.getInstance();
+    const modelsLoaded = models.getModelsLoadedStatus();
+    const color = selected ? 0xff00ff : 0x26d46e;
+
     this.material = new THREE.MeshBasicMaterial({
-      color: this.color,
+      map: modelsLoaded ? models.getGrassTexture() : undefined,
+      color: !modelsLoaded ? color : undefined,
     });
   };
 
@@ -41,7 +50,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
 
   showPanel = (show: boolean, player: Player) => {};
 
-  addFieldElement = (element: THREE.Mesh) => {
+  addFieldElement = (element: THREE.Object3D) => {
     element.position.set(this.position.x, this.position.y, element.position.z);
     this.elementsOnField.add(element);
   };
@@ -72,6 +81,34 @@ export class Field extends THREE.Mesh implements FieldInterface {
       0
     );
     this.elementsOnField.add(this);
+
+    const createTree = Math.random();
+    const createHouse = Math.random();
+
+    if (createTree < settings.TREE_CREATION_CHANCE) {
+      const grass = Models.getInstance().getTreeModelClone();
+      grass.position.set(
+        this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        (mapSizeY - this.coord.y - 1) *
+          (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        0
+      );
+      this.elementsOnField.add(grass);
+    } else if (createHouse < settings.HOUSE_CREATION_CHANCE) {
+      const house = Models.getInstance().getHouseModelClone();
+      house.position.set(
+        this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        (mapSizeY - this.coord.y - 1) *
+          (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
+          settings.FIELD_SIZE / 2,
+        0
+      );
+      this.elementsOnField.add(house);
+    }
+
     return this.elementsOnField;
   };
 

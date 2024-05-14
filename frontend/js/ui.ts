@@ -5,6 +5,8 @@ import { Tower } from "./tower";
 import { Player } from "./player";
 import { Upgrade } from "./upgrade";
 import { Variant } from "./types";
+import { Loading } from "./loading";
+import { Variant } from "./types";
 import { Game } from "./game";
 import { Board } from "./board";
 import { BoardCreator } from "./boardCreator";
@@ -13,7 +15,6 @@ export const getBoardElement = () => {
   return $("#board");
 };
 
-
 export const clearFieldOptions = () => {
   $("#fieldCoordsTitle").empty();
   $("#coordY").empty();
@@ -21,10 +22,16 @@ export const clearFieldOptions = () => {
   $("#fieldButtons").empty();
 };
 
+export const setLoadingMessage = (message: string) => {
+  $("#loadingMessage").text(message);
+};
 export const removeLoading = () => {
   $("#loading").remove();
 };
 
+export const setErrorMessage = (message: string) => {
+  $("#errorMessage").text(message);
+};
 export const removeWelcome = () => {
   $("#welcome").remove();
 };
@@ -47,6 +54,10 @@ export const boardMouseMove = (callback: any)=>{
 }
 
 
+export const towerHover = (callback: any) => {
+  getBoardElement().on("mousemove", callback);
+};
+
 export const boardClick = (callback: any) => {
   getBoardElement().on("click", callback);
 };
@@ -56,7 +67,12 @@ export const boardOffClick = () => {
 };
 
 export const refreshSelectOptions = (
+export const refreshSelectOptions = (
   possibleLevels: number,
+  playerLevel: number
+) => {
+  const select = $("#levelSelect");
+  select.empty();
   playerLevel: number
 ) => {
   const select = $("#levelSelect");
@@ -84,6 +100,9 @@ export const startButtonClick = (prepareGame: (index: number) => void) => {
 
   button.off("click");
   button.on("click", () => {
+    if (!Loading.getInstance().canStartGame()) {
+      return;
+    }
     const value = select.val();
     const levelElement = $("#level");
     levelElement.css("display", "none");
@@ -95,8 +114,6 @@ export const showSelectLevel = () => {
   clearFieldOptions();
   const levelElement = $("#level");
   levelElement.css("display", "flex");
-  // const button = $("#startLevel"); // to delete
-  // button.trigger("click"); // to delete
 };
 
 export const setTimer = (time: number, startRound: () => void) => {
@@ -139,46 +156,55 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
   coordX.text("X: " + tower.building.coord.x);
 
   if (!tower.active) {
+    const disabledUpgradeActivate = !player.canBuy(
+      tower.activeCost.nextUpgradeCost
+    );
     const activate = $("<button>")
-      .addClass("gameButton")
+      .addClass(disabledUpgradeActivate ? "disabledGameButton" : "gameButton")
       .text("ACTIVATE TOWER")
       .on("click", () => upgradeClick(tower, tower.activeCost, player))
-      .prop("disabled", !player.canBuy(tower.activeCost.nextUpgradeCost));
+      .prop("disabled", disabledUpgradeActivate);
+
     fieldButtons.append(activate);
     return;
   }
 
+  const disabledUpgradeRange =
+    !player.canBuy(tower.range.nextUpgradeCost) || !tower.range.canLevelUp();
   const range = $("<button>")
-    .addClass("gameButton")
-    .text(tower.range.canLevelUp() ? "UPGRADE RANGE" : "MAX RANGE REACHED")
+    .addClass(disabledUpgradeRange ? "disabledGameButton" : "gameButton")
+    .text(
+      tower.range.canLevelUp()
+        ? `UPGRADE RANGE (${tower.range.getUpgradeStatus()})`
+        : `MAX RANGE REACHED (${tower.range.getUpgradeStatus()})`
+    )
     .on("click", () => upgradeClick(tower, tower.range, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.range.nextUpgradeCost) || !tower.range.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradeRange);
 
+  const disabledUpgradePower =
+    !player.canBuy(tower.power.nextUpgradeCost) || !tower.power.canLevelUp();
   const power = $("<button>")
-    .addClass("gameButton")
-    .text(tower.power.canLevelUp() ? "UPGRADE POWER" : "MAX POWER REACHED")
+    .addClass(disabledUpgradePower ? "disabledGameButton" : "gameButton")
+    .text(
+      tower.power.canLevelUp()
+        ? `UPGRADE POWER (${tower.power.getUpgradeStatus()})`
+        : `MAX POWER REACHED (${tower.power.getUpgradeStatus()})`
+    )
     .on("click", () => upgradeClick(tower, tower.power, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.power.nextUpgradeCost) || !tower.power.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradePower);
 
+  const disabledUpgradeFrequency =
+    !player.canBuy(tower.frequency.nextUpgradeCost) ||
+    !tower.frequency.canLevelUp();
   const frequency = $("<button>")
-    .addClass("gameButton")
+    .addClass(disabledUpgradeFrequency ? "disabledGameButton" : "gameButton")
     .text(
       tower.frequency.canLevelUp()
-        ? "UPGRADE FREQUENCY"
-        : "MAX FREQUENCY FREQUENCY"
+        ? `UPGRADE FREQUENCY (${tower.frequency.getUpgradeStatus()})`
+        : `MAX FREQUENCY FREQUENCY (${tower.frequency.getUpgradeStatus()})`
     )
     .on("click", () => upgradeClick(tower, tower.frequency, player))
-    .prop(
-      "disabled",
-      !player.canBuy(tower.frequency.nextUpgradeCost) ||
-        !tower.frequency.canLevelUp()
-    );
+    .prop("disabled", disabledUpgradeFrequency);
 
   fieldButtons.append(range);
   fieldButtons.append(power);
@@ -188,6 +214,7 @@ export const showTowerPanel = (tower: Tower | null, player: Player) => {
 const upgradeClick = (tower: Tower, upgrade: Upgrade, player: Player) => {
   if (player.canBuy(upgrade.nextUpgradeCost)) {
     player.substractMoney(upgrade.nextUpgradeCost);
+    showPlayerStats(player);
     upgrade.levelUp();
     showTowerPanel(tower, player);
   }
@@ -229,6 +256,7 @@ const getMessageColor = (variant: Variant) => {
     ? "#2a9117"
     : "#1616d9";
 };
+
 
 export const welcomeButtonsHandler = (game: Game) => {
   const startButton = $("#startGame");

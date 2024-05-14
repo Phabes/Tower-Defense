@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { settings } from "./settings";
 import { Enemy } from "./enemy";
 import { Field } from "./fields/field";
@@ -13,6 +14,7 @@ import {
   getBoardElement,
   setTimer,
   showPlayerStats,
+  towerHover,
 } from "./ui";
 import { Tower } from "./tower";
 import { event } from "jquery";
@@ -25,10 +27,10 @@ export class Board {
   boardGroup: THREE.Group<THREE.Object3DEventMap>;
   enemiesGroup: THREE.Group<THREE.Object3DEventMap>;
   raycaster: THREE.Raycaster;
-  level: Level;
-  round: number;
-  animations: number;
-  spawnEnemiesInterval: number;
+  level!: Level;
+  round!: number;
+  animations!: number;
+  spawnEnemiesInterval!: NodeJS.Timeout;
   selectedField: Field | null;
   hoveredField: Field | null;
   // heart: THREE.Mesh<
@@ -102,6 +104,31 @@ export class Board {
     }
   };
 
+  hover = (event: JQuery.MouseMoveEvent) => {
+    const pointer = new THREE.Vector2();
+    const boardElement = getBoardElement();
+    pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
+    pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
+    this.raycaster.setFromCamera(pointer, this.game.camera);
+
+    const intersects = this.raycaster.intersectObjects(
+      this.boardGroup.children
+    );
+    for (const tower of this.towers) {
+      if (tower.active) {
+        tower.hovered(false);
+      }
+    }
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Building) {
+          object.fieldHover();
+        }
+      }
+    }
+  };
+
   setLevel = (level: Level) => {
     this.level = level;
   };
@@ -142,6 +169,8 @@ export class Board {
 
     this.setPath();
     boardClick(this.click);
+    towerHover(this.hover);
+
     boardMouseMove(this.onHover)
     this.animate();
   };
@@ -239,7 +268,7 @@ export class Board {
   };
 
   enemyFinishedPath = (enemy: Enemy) => {
-    enemy.success(this.game);
+    enemy.success();
     this.removeEnemy(enemy);
     this.game.player.takeDamage(1);
     showPlayerStats(this.game.player);
@@ -252,7 +281,7 @@ export class Board {
   };
 
   enemyDied = (enemy: Enemy) => {
-    enemy.died(this.game);
+    enemy.died();
     this.removeEnemy(enemy);
     this.game.player.addMoney(enemy.money);
     showPlayerStats(this.game.player);
@@ -303,6 +332,7 @@ export class Board {
 
     for (const tower of this.towers) {
       if (tower.active) {
+        // tower.rangeMesh.visible = false;
         tower.clearBullets();
         for (const bullet of tower.bullets) {
           bullet.move(tower.building.position);
@@ -325,7 +355,7 @@ export class Board {
       }
     }
 
-    this.game.renderer.renderGame();
+    this.game.renderer.renderGame(this.game.scene, this.game.camera);
   };
 
   getMouseVector2 = (event: JQuery.MouseEventBase) =>{

@@ -1,4 +1,9 @@
+import { Mailbox } from "./mailbox";
+import { Message } from "./message";
+import { settings } from "./settings";
+
 export class Upgrade {
+  name: string;
   level: number;
   maxLevel: number;
   value: number;
@@ -7,12 +12,14 @@ export class Upgrade {
   levelUpCallback: () => void;
 
   constructor(
+    name: string,
     maxLevel: number,
     value: number,
     nextUpgradeCost: number,
     nextUpgradeIncrease: number,
     levelUpCallback: () => void
   ) {
+    this.name = name;
     this.level = 0;
     this.maxLevel = maxLevel;
     this.value = value;
@@ -20,6 +27,10 @@ export class Upgrade {
     this.nextUpgradeIncrease = nextUpgradeIncrease;
     this.levelUpCallback = levelUpCallback;
   }
+
+  getUpgradeStatus = () => {
+    return `${this.level}/${this.maxLevel}`;
+  };
 
   canLevelUp = () => {
     return this.level < this.maxLevel;
@@ -31,6 +42,12 @@ export class Upgrade {
     }
     this.level++;
     this.value += this.nextUpgradeIncrease;
+    const message = new Message(
+      `${this.name} upgraded. -${this.nextUpgradeCost} gold`,
+      "informative",
+      settings.MESSAGE_TTL
+    );
+    Mailbox.getInstance().addMessage(message);
     this.levelUpCallback();
   };
 }

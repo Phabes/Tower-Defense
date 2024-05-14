@@ -19,6 +19,9 @@ import { Renderer } from "./renderer";
 import { Level } from "./types";
 import { Message } from "./message";
 import { BoardCreator } from "./boardCreator";
+import { Mailbox } from "./mailbox";
+import { Controls } from "./controls";
+import { Loading } from "./loading";
 
 export class Game {
   levels: Level[];
@@ -26,16 +29,23 @@ export class Game {
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
+  controls: Controls;
   player: Player;
   board: Board;
 
-  constructor(scene: THREE.Scene, camera: Camera, renderer: Renderer) {
+  constructor(
+    scene: THREE.Scene,
+    camera: Camera,
+    renderer: Renderer,
+    controls: Controls
+  ) {
     this.levels = [];
     this.messages = [];
 
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
+    this.controls = controls;
     this.player = new Player(10, 500);
 
     welcomeButtonsHandler(this);
@@ -46,7 +56,14 @@ export class Game {
     this.board = new Board(this)
     this.retrieveLevels();
     windowResize(this.camera, this.renderer);
+    startButtonClick(this.prepareGame);
   }
+
+  refreshLevelsSelection = () => {
+    this.player.levelCompleted();
+    refreshSelectOptions(this.levels.length, this.player.level);
+    showSelectLevel();
+  };
 
   startLevelCreator = (width:number, height:number) => {
     if (this.board)
@@ -65,44 +82,35 @@ export class Game {
   };
 
   retrieveLevels = () => {
-    getLevels().done((res) => {
-
-      const levels = JSON.parse(res).levels;
-      this.levels = levels;
-      removeLoading();
-      this.refreshLevelsSelection();
-      startButtonClick(this.prepareGame);
-    });
+    getLevels()
+      .done((res) => {
+        const levels = res.levels;
+        this.levels = levels;
+        this.refreshLevelsSelection();
+        Loading.getInstance().setLevelsLoaded(true);
+      })
+      .catch(() => {
+        Loading.getInstance().setLevelsError(true);
+      });
   };
 
   levelNotCompleted = () => {
-    this.deleteMessages();
+    Mailbox.getInstance().deleteMessages();
     this.refreshLevelsSelection();
   };
 
   levelCompleted = (level: Level) => {
     const index = this.levels.indexOf(level);
     this.player.changePlayerLevel(index + 1);
-    this.deleteMessages();
+    Mailbox.getInstance().deleteMessages();
     this.refreshLevelsSelection();
-  };
-
-  addMessage = (message: Message) => {
-    this.messages.push(message);
-  };
-
-  deleteMessages = () => {
-    for (const message of this.messages) {
-      message.deleteMessage();
-    }
-    this.messages = [];
   };
 
   prepareGame = (index: number) => {
     this.board.setLevel(this.levels[index]);
     this.board.createBoard();
     this.camera.setCamera();
-    this.renderer.renderGame();
+    this.renderer.renderGame(this.scene, this.camera);
     this.board.prepareRound(0);
   };
 

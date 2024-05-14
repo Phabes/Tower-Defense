@@ -4,8 +4,9 @@ import { Building } from "./fields/building";
 import { Upgrade } from "./upgrade";
 import { Bullet } from "./bullet";
 import { Enemy } from "./enemy";
+import { Models } from "./models";
 
-export class Tower extends THREE.Mesh {
+export class Tower extends THREE.Group {
   building: Building;
   active: boolean;
   activeCost: Upgrade;
@@ -14,29 +15,72 @@ export class Tower extends THREE.Mesh {
   frequency: Upgrade;
   targets: Enemy[];
   bullets: Bullet[];
-  shooting: number;
+  shooting: NodeJS.Timeout | undefined;
+  towerContainer: THREE.Object3D;
+  height: number;
+  rangeMesh: THREE.Mesh;
   upgradeBuilding: () => void;
 
   constructor(building: Building, upgradeBuilding: () => void) {
     super();
     this.building = building;
     this.active = false;
-    this.activeCost = new Upgrade(1, 0, 200, 0, this.activate);
+    this.activeCost = new Upgrade("Activate", 1, 0, 200, 0, this.activate);
     this.range = new Upgrade(
+      "Range",
       2,
-      settings.FIELD_SIZE + settings.FIELD_SIZE / 2,
+      settings.FIELD_SIZE / 2 + settings.FIELD_SIZE + settings.SPACE_BETWEEN,
       300,
-      1,
-      this.rebuildTower
+      settings.FIELD_SIZE + settings.SPACE_BETWEEN,
+      this.rangeUpgrade
     );
-    this.power = new Upgrade(2, 50, 250, 50, this.rebuildTower);
-    this.frequency = new Upgrade(1, 600, 200, -200, this.upgradeFrequency);
+    this.power = new Upgrade("Power", 2, 50, 250, 50, this.rebuildTower);
+    this.frequency = new Upgrade(
+      "Frequency",
+      1,
+      600,
+      200,
+      -200,
+      this.upgradeFrequency
+    );
     this.targets = [];
     this.bullets = [];
-    this.shooting = 0;
+    this.towerContainer = Models.getInstance().getTowerModelClone();
+    this.rangeMesh = this.createRangeMesh();
+    this.towerContainer.add(this.rangeMesh);
+    this.height = this.calculateTowerHeight();
     this.upgradeBuilding = upgradeBuilding;
-    this.material = new THREE.MeshBasicMaterial({ color: 0xf59440 });
   }
+
+  createRangeMesh = () => {
+    const geometry = new THREE.CircleGeometry(this.range.value, 64);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.4,
+    });
+
+    const rangeMesh = new THREE.Mesh(geometry, material);
+    rangeMesh.position.set(0, 0, 5);
+    rangeMesh.visible = false;
+    return rangeMesh;
+  };
+
+  hovered = (hover: boolean) => {
+    this.rangeMesh.visible = hover;
+  };
+
+  rangeUpgrade = () => {
+    for (let i = this.towerContainer.children.length - 1; i >= 0; i--) {
+      if (this.towerContainer.children[i] === this.rangeMesh) {
+        this.towerContainer.children.splice(i, 1);
+      }
+    }
+    this.rangeMesh = this.createRangeMesh();
+    this.towerContainer.add(this.rangeMesh);
+    this.rebuildTower();
+  };
 
   setTargets = (targets: Enemy[]) => {
     this.targets = targets;
@@ -69,8 +113,7 @@ export class Tower extends THREE.Mesh {
 
   shoot = () => {
     const target = this.chooseTarget();
-    const height = settings.TOWER_DEFAULT_SIZE;
-    const positionZ = this.building.position.z + height / 2;
+    const positionZ = this.building.position.z + this.height;
     const bullet = new Bullet(target, this.power.value, positionZ);
     this.add(bullet);
     this.bullets.push(bullet);
@@ -97,14 +140,15 @@ export class Tower extends THREE.Mesh {
   };
 
   upgradeTower = () => {
-    const height = settings.TOWER_DEFAULT_SIZE;
+    // Add tower modification
+    this.height = this.calculateTowerHeight();
+    this.add(this.towerContainer);
+  };
 
-    this.geometry = new THREE.BoxGeometry(
-      settings.TOWER_DEFAULT_SIZE,
-      settings.TOWER_DEFAULT_SIZE,
-      height
-    );
-    this.position.setZ(this.building.position.z + height / 2);
+  calculateTowerHeight = () => {
+    const size = new THREE.Vector3();
+    new THREE.Box3().setFromObject(this.towerContainer).getSize(size);
+    return size.z;
   };
 
   inRange = (objectPosition3d: THREE.Vector3) => {

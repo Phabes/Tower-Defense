@@ -2,9 +2,13 @@ import * as THREE from "three";
 import { Field } from "./fields/field";
 import { settings } from "./settings";
 import { Message } from "./message";
+import { Mailbox } from "./mailbox";
+import { Models } from "./models";
+import { Animation } from "./animation";
+import { Message } from "./message";
 import { Game } from "./game";
 
-export class Enemy extends THREE.Mesh {
+export class Enemy extends THREE.Group {
   hp: number;
   speed: number;
   money: number;
@@ -13,6 +17,8 @@ export class Enemy extends THREE.Mesh {
   enemyFinishedPath: (e: Enemy) => void;
   alive: boolean;
   active: boolean;
+  animation: Animation;
+  enemyContainer: THREE.Object3D;
 
   constructor(
     hp: number,
@@ -30,6 +36,12 @@ export class Enemy extends THREE.Mesh {
     this.enemyFinishedPath = enemyFinishedPath;
     this.alive = false;
     this.active = true;
+
+    const models = Models.getInstance();
+    this.enemyContainer = models.getEnemyModelClone();
+    const enemyClips = models.getEnemyClips();
+    this.animation = new Animation(this.enemyContainer, enemyClips);
+    this.animation.setAnimation("Walk");
   }
 
   setAlive = (alive: boolean) => {
@@ -41,13 +53,16 @@ export class Enemy extends THREE.Mesh {
   };
 
   spawn = () => {
-    this.geometry = new THREE.SphereGeometry(settings.ENEMY_SIZE);
-    this.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     this.position.set(
       this.currentField.position.x,
       this.currentField.position.y,
       this.currentField.position.z
     );
+
+    this.animation.startAnimation();
+
+    this.add(this.enemyContainer);
+
     return this;
   };
 
@@ -55,11 +70,21 @@ export class Enemy extends THREE.Mesh {
     if (!this.nextField) {
       return;
     }
+
+    this.animation.animate();
+
     const moveVector = this.nextField.position
       .clone()
       .sub(this.currentField.position)
       .normalize();
     this.translateOnAxis(moveVector, this.speed);
+
+    const angle = Math.atan2(
+      this.currentField.coord.y - this.nextField.coord.y,
+      this.nextField.coord.x - this.currentField.coord.x
+    );
+    this.enemyContainer.rotation.z = angle;
+
     if (this.checkFieldChange()) {
       this.currentField = this.nextField;
       this.nextField = this.nextField.getRandomNextField();
@@ -87,21 +112,21 @@ export class Enemy extends THREE.Mesh {
     return this.hp > 0;
   };
 
-  died = (game: Game) => {
+  died = () => {
     const message = new Message(
       `Enemy killed. +${this.money} gold`,
       "success",
       settings.MESSAGE_TTL
     );
-    game.addMessage(message);
+    Mailbox.getInstance().addMessage(message);
   };
 
-  success = (game: Game) => {
+  success = () => {
     const message = new Message(
       "Enemy finished path.",
       "error",
       settings.MESSAGE_TTL
     );
-    game.addMessage(message);
+    Mailbox.getInstance().addMessage(message);
   };
 }
