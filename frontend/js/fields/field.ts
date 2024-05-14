@@ -6,7 +6,7 @@ import { Models } from "../models";
 import { Loading } from "../loading";
 
 interface FieldInterface {
-  colorField(selected: boolean): void;
+  colorField(): void;
   showPanel(show: boolean, player: Player): void;
   addFieldElement(element: THREE.Mesh): void;
   createField(mapSizeY: number): THREE.Group<THREE.Object3DEventMap>;
@@ -16,7 +16,9 @@ export class Field extends THREE.Mesh implements FieldInterface {
   coord: Coord;
   type: Surface;
   nextFields: Field[];
+  color:string;
   elementsOnField: THREE.Group;
+  isSelected:boolean = false;
 
   constructor(coord: Coord, type: Surface) {
     super();
@@ -24,6 +26,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
     this.type = type;
     this.nextFields = [];
     this.elementsOnField = new THREE.Group();
+    this.color = this.isSelected ? "#ff00ff" : "#26d46e"
   }
 
   colorField = (selected: boolean) => {
@@ -36,6 +39,14 @@ export class Field extends THREE.Mesh implements FieldInterface {
       color: !modelsLoaded ? color : undefined,
     });
   };
+
+  select = () =>{
+    this.isSelected = true;
+  }
+
+  unSelect = () => {
+    this.isSelected = false;
+  }
 
   showPanel = (show: boolean, player: Player) => {};
 
@@ -60,7 +71,7 @@ export class Field extends THREE.Mesh implements FieldInterface {
       settings.FIELD_SIZE,
       settings.FIELD_SIZE
     );
-    this.colorField(false);
+    this.colorField();
     this.position.set(
       this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
         settings.FIELD_SIZE / 2,
@@ -100,4 +111,13 @@ export class Field extends THREE.Mesh implements FieldInterface {
 
     return this.elementsOnField;
   };
+
+  highlight = () => {
+    (this.material as THREE.MeshBasicMaterial).color.set("#42daf5")
+  }
+  
+  getCoords = () => {
+    return this.coord
+  }
+
 }

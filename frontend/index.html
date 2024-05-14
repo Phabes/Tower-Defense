@@ -35,6 +35,7 @@
             <div class="emphasis" id="messagesContent"></div>
           </div>
         </div>
+       
         <div class="fullPanel" id="level">
           <div id="levelTitle">Choose Level:</div>
           <div id="levelChoiceContainer">
@@ -50,10 +51,53 @@
           <div id="alertContent"></div>
           <div class="gameButton" id="alertAccept">OK</div>
         </div>
-        <div class="fullPanel" id="loading">
-          <span id="loader"></span>
-          <div class="loadingInfo" id="loadingMessage">Loading ...</div>
-          <div class="loadingInfo" id="errorMessage"></div>
+        <div class="fullPanel" id="loading"><span id="loader"></span></div>
+        <div class="fullPanel" id="creator">
+          <div id="boardSize" class="panelContent">
+            <table>
+              <tr>
+                <td>Width:</td>
+                <td><input type="number" id="newBoardWidth"></td>
+              </tr>
+              <tr>
+                <td>Height:</td>
+                <td><input type="number" id="newBoardHeight"></td>
+              </tr>
+            </table>
+            <div class="gameButton" id="createBoard">CREATE BOARD</div>
+          </div>
+          <div id="boardFields" class="panelContent">
+            <table>
+              <tr id="pathFieldPicker">
+                <td class="selectedFieldPicker"><input type="radio" id="pathFieldPickerRB" name="fieldPicker" value="path" checked></td>
+                <td>PATH</td>
+              </tr>
+              <tr id="towerFieldPicker">
+                <td><input type="radio" id="towerFieldPickerRB" name="fieldPicker" value="building"></td>
+                <td>TOWER</td>
+              </tr>
+              <tr id="grassFieldPicker">
+                <td><input type="radio" id="grassFieldPickerRB"  name="fieldPicker" value="grass"></td>
+                <td>GRASS</td>
+              </tr>
+            </table>
+            <div class="gameButton" id="acceptBoard">ACCEPT BOARD</div>
+          </div>
+          <div class="panelContent" id="startFieldPicker">
+            <span>Choose starting field</span>
+            <div class="gameButton" id="acceptStartField">ACCEPT</div>
+          </div>
+          <div class="panelContent" id="endFieldPicker">
+            <span>Choose end field</span>
+            <div class="gameButton" id="acceptEndField">ACCEPT</div>
+          </div>
+        </div>
+        <div class="fullPanel" id="welcome">
+          <div class="panelContent">
+            <div class="gameButton" id="startGame">START GAME</div>
+            <div class="gameButton" id="createLevel">CREATE LEVEL</div>
+          </div>
+          
         </div>
       </div>
     </div>

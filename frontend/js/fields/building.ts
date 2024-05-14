@@ -15,9 +15,9 @@ export class Building extends Field {
     this.tower = new Tower(this, this.upgradeBuilding);
   }
 
-  colorField = (selected: boolean) => {
+  colorField = () => {
     this.material = new THREE.MeshBasicMaterial({
-      color: selected ? 0x93d4ed : 0xeb7063,
+      color: this.isSelected ? 0xff00ff : 0xeb4634,
     });
   };
 

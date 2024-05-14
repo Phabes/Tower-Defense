@@ -5,6 +5,8 @@ import { Message } from "./message";
 import { Mailbox } from "./mailbox";
 import { Models } from "./models";
 import { Animation } from "./animation";
+import { Message } from "./message";
+import { Game } from "./game";
 
 export class Enemy extends THREE.Group {
   hp: number;

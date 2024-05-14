@@ -4,20 +4,28 @@ import { Board } from "./board";
 import { Player } from "./player";
 import {
   refreshSelectOptions,
+  removeLoading,
+  removeWelcome,
   showAlert,
   showSelectLevel,
   startButtonClick,
+
+  welcomeButtonsHandler,
+
   windowResize,
 } from "./ui";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { Level } from "./types";
+import { Message } from "./message";
+import { BoardCreator } from "./boardCreator";
 import { Mailbox } from "./mailbox";
 import { Controls } from "./controls";
 import { Loading } from "./loading";
 
 export class Game {
   levels: Level[];
+  messages: Message[];
   scene: THREE.Scene;
   camera: Camera;
   renderer: Renderer;
@@ -32,17 +40,39 @@ export class Game {
     controls: Controls
   ) {
     this.levels = [];
+    this.messages = [];
 
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
     this.controls = controls;
     this.player = new Player(10, 500);
-    this.board = new Board(this);
 
+    welcomeButtonsHandler(this);
+  }
+
+  startGame = () => {
+    removeWelcome();
+    this.board = new Board(this)
     this.retrieveLevels();
-    windowResize(camera, renderer);
+    windowResize(this.camera, this.renderer);
     startButtonClick(this.prepareGame);
+  }
+
+  refreshLevelsSelection = () => {
+    this.player.levelCompleted();
+    refreshSelectOptions(this.levels.length, this.player.level);
+    showSelectLevel();
+  };
+
+  startLevelCreator = (width:number, height:number) => {
+    if (this.board)
+      this.board.clearBoard()
+    this.board = new BoardCreator(this, width, height);
+    this.board.createBoard();
+    this.camera.setCamera();
+    this.renderer.renderGame();
+    windowResize(this.camera, this.renderer);
   }
 
   refreshLevelsSelection = () => {

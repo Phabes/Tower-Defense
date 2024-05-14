@@ -142,6 +142,133 @@ body {
 
 #messagesContent {
   display: flex;
+  display: flex;
+  flex: 1;
+  padding: 10px;
+  background-color: #6ce08b;
+  position: relative;
+}
+
+.fullPanel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #6ce08b;
+}
+
+#level {
+  display: none;
+  gap: 10px;
+}
+
+#levelTitle {
+  font-size: 20px;
+}
+
+#levelChoiceContainer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#createBoardSize{
+  display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#levelSelect {
+  height: min-content;
+}
+
+.gameButton {
+  cursor: pointer;
+  border: 2px solid #49594e;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #814ede;
+  color: #ffffff;
+}
+
+.gameButton:hover {
+  background-color: #5a33a3;
+}
+
+#timer {
+  display: none;
+}
+
+#timerTitle {
+  font-size: 20px;
+  text-align: center;
+}
+
+#timeElement {
+  font-size: 60px;
+}
+
+#alert {
+  display: none;
+}
+
+#alertContent {
+  font-size: 60px;
+  color: #ff0000;
+}
+
+#mainInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.pieceInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 5px;
+}
+
+.playerInfo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.playerIcon {
+  display: flex;
+  width: 32px;
+}
+
+.playerIcon > img {
+  width: 100%;
+}
+
+#fieldOptions {
+  flex: 3;
+}
+
+#fieldButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#messages {
+  overflow: hidden;
+}
+
+#messagesTitle {
+  font-size: 30px;
+}
+
+#messagesContent {
+  display: flex;
   flex: 1;
   flex-direction: column;
   font-size: 20px;
@@ -214,4 +341,105 @@ body {
   100% {
     transform: rotate(360deg);
   }
+  flex-direction: column;
+  font-size: 20px;
+  overflow-y: scroll;
+  gap: 3px;
+}
+
+.message {
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.fading {
+  animation-name: fadingAnimation;
+  animation-duration: 1s;
+}
+
+@keyframes fadingAnimation {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.emphasisTitle {
+  font-size: 24px;
+}
+
+.emphasis {
+  font-size: 20px;
+}
+
+#loading {
+  display: flex;
+}
+
+#loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ffffff;
+  border-bottom-color: #ff3d00;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#creator{
+  display: none;
+  gap: 10px;
+}
+
+.panelContent{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
+}
+
+#boardFields{
+  display:none;
+}
+
+#boardFields td:first-child{
+  width: 100px;
+  height:  100px;
+  border: 1px solid black;
+  border-radius: 1%;
+}
+
+#grassFieldPicker td:first-child{
+  background-color: #26d46e;
+}
+
+#pathFieldPicker td:first-child {
+  background-color: #edea3e;
+}
+
+#towerFieldPicker td:first-child {
+  background-color: #eb4634;
+}
+
+.selectedFieldPicker{
+  border:3px solid #ff00ff !important;
+}
+
+#boardFields input[type="radio"]{
+  display: none;
 }

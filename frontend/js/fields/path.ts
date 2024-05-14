@@ -6,8 +6,15 @@ import { Models } from "../models";
 import { Loading } from "../loading";
 
 export class Path extends Field {
+  typeColors = {
+    "default":"#edea3e",
+    "start":"#f5ad42",
+    "end":"#4242f5",
+    "highlight":"#42daf5"
+  }
   constructor(coord: Coord, type: Surface) {
     super(coord, type);
+    this.color = this.isSelected ? "#ff00ff" : "#edea3e";
   }
 
   colorField = (selected: boolean) => {

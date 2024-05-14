@@ -6,6 +6,10 @@ import { Player } from "./player";
 import { Upgrade } from "./upgrade";
 import { Variant } from "./types";
 import { Loading } from "./loading";
+import { Variant } from "./types";
+import { Game } from "./game";
+import { Board } from "./board";
+import { BoardCreator } from "./boardCreator";
 
 export const getBoardElement = () => {
   return $("#board");
@@ -21,13 +25,19 @@ export const clearFieldOptions = () => {
 export const setLoadingMessage = (message: string) => {
   $("#loadingMessage").text(message);
 };
+export const removeLoading = () => {
+  $("#loading").remove();
+};
 
 export const setErrorMessage = (message: string) => {
   $("#errorMessage").text(message);
 };
+export const removeWelcome = () => {
+  $("#welcome").remove();
+};
 
-export const removeLoading = () => {
-  $("#loading").remove();
+export const showCreator = () => {
+  $("#creator").css({"display":"block"});
 };
 
 export const windowResize = (camera: Camera, renderer: Renderer) => {
@@ -38,6 +48,11 @@ export const windowResize = (camera: Camera, renderer: Renderer) => {
     renderer.setRendererSize(boardElement);
   });
 };
+
+export const boardMouseMove = (callback: any)=>{
+  getBoardElement().on("mousemove", callback);
+}
+
 
 export const towerHover = (callback: any) => {
   getBoardElement().on("mousemove", callback);
@@ -52,7 +67,12 @@ export const boardOffClick = () => {
 };
 
 export const refreshSelectOptions = (
+export const refreshSelectOptions = (
   possibleLevels: number,
+  playerLevel: number
+) => {
+  const select = $("#levelSelect");
+  select.empty();
   playerLevel: number
 ) => {
   const select = $("#levelSelect");
@@ -236,3 +256,109 @@ const getMessageColor = (variant: Variant) => {
     ? "#2a9117"
     : "#1616d9";
 };
+
+
+export const welcomeButtonsHandler = (game: Game) => {
+  const startButton = $("#startGame");
+  const createButton = $("#createLevel");
+
+  startButton.off("click");
+  startButton.on("click", () => {
+    game.startGame()
+  });
+
+  createButton.off("click");
+  createButton.on("click", () => {
+    showBoardSizePanel(game)
+   
+  });
+}
+
+const showBoardSizePanel = (game: Game) => {
+  removeWelcome();
+  removeLoading();
+  showCreator();
+
+  const createBoardButton = $("#createBoard");
+
+  createBoardButton.off("click");
+  createBoardButton.on("click", () => {
+    const reg = /^\d+$/;
+    const width = $("#newBoardWidth").val() as string;
+    const height = $("#newBoardHeight").val() as string;
+    if (reg.test(width) && reg.test(height)) {
+      game.startLevelCreator(parseInt(width), parseInt(height));
+      showCreatorFieldsPanel()
+    }
+  });
+}
+
+const showCreatorFieldsPanel = ()  => {
+  $("#boardSize").remove();
+  $("#boardFields").css({"display":"flex"});
+
+  const pathFieldPicker = $("#pathFieldPicker td:first-child")
+  const towerFieldPicker = $("#towerFieldPicker td:first-child");
+  const grassFieldPicker = $("#grassFieldPicker td:first-child");
+
+  pathFieldPicker.off("click");
+  towerFieldPicker.off("click");
+  grassFieldPicker.off("click");
+
+  pathFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker")
+    pathFieldPicker.addClass("selectedFieldPicker")
+    $("#pathFieldPickerRB").prop("checked",true);
+  })
+
+  towerFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker");
+    towerFieldPicker.addClass("selectedFieldPicker");
+    $("#towerFieldPickerRB").prop("checked", true);
+
+  });
+
+  grassFieldPicker.on("click", function () {
+    $(".selectedFieldPicker").removeClass("selectedFieldPicker");
+    grassFieldPicker.addClass("selectedFieldPicker");
+    $("#grassFieldPickerRB").prop("checked", true);
+  });
+}
+
+export const getFieldPickerType = () => {
+  return $("input[name='fieldPicker']:checked").val();
+}
+
+export const acceptCreatedLevel = (board: BoardCreator) =>{
+  const acceptBoardButton = $("#acceptBoard");
+  const acceptStartFieldButton = $("#acceptStartField");
+  const acceptEndFieldButton = $("#acceptEndField");
+
+  acceptBoardButton.off("click");
+  acceptBoardButton.on("click",function(){
+    board.acceptBoard();
+    $("#boardFields").hide();
+  })
+
+  acceptStartFieldButton.off("click");
+  acceptStartFieldButton.on("click", function () {
+    const  isValid = board.acceptStartField();
+    if (isValid)
+      $("#startFieldPicker").hide();
+
+  });
+
+  acceptEndFieldButton.off("click");
+  acceptEndFieldButton.on("click", function () {
+    const isValid = board.acceptEndField();
+    if (isValid)
+      $("#endFieldPicker").hide();
+  });
+}
+
+export const alertPopup =(message:string)=>{
+  alert(message)
+}
+
+
+

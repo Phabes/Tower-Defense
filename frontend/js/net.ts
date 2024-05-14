@@ -1,10 +1,25 @@
 import $ from "jquery";
+import { Level } from "./types";
 
 export const getLevels = () => {
   return $.ajax({
-    url: "http://localhost:4000/levels",
+    url: "http://localhost:4000/levels/getLevels",
     method: "get",
     dataType: "json",
     contentType: "application/json",
   });
+};
+
+
+export const postLevel = (level:Level) => {
+  return $.post("http://localhost:4000/levels/newlevel",level)
+  return $.ajax({
+    url: "http://localhost:4000/levels/newlevel",
+    method: "post",
+    dataType: "json",
+    contentType: "application/json",
+    data:JSON.stringify(level)
+  });
+
+  
 };
