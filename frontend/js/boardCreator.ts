@@ -8,6 +8,7 @@ import { Path } from "./fields/path";
 import { Building } from "./fields/building";
 import { Coord, Level, Square } from "./types";
 import { CoordEquals } from "./types/coord";
+import { postLevel } from "./net";
 
 export class BoardCreator extends Board {
 
@@ -176,6 +177,7 @@ export class BoardCreator extends Board {
       this.fieldNextCoords = []
       return false;
     }
+    this.save();
     return true;
   }
 
@@ -260,7 +262,7 @@ export class BoardCreator extends Board {
       waves:[{timer:10,enemies:10}],
       startingCoords:[this.startCoords]
     }
-
+      postLevel(level);
   }
 
 
