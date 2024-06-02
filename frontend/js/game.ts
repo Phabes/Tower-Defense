@@ -59,11 +59,7 @@ export class Game {
     startButtonClick(this.prepareGame);
   }
 
-  refreshLevelsSelection = () => {
-    this.player.levelCompleted();
-    refreshSelectOptions(this.levels.length, this.player.level);
-    showSelectLevel();
-  };
+  
 
   startLevelCreator = (width:number, height:number) => {
     if (this.board)
@@ -71,12 +67,13 @@ export class Game {
     this.board = new BoardCreator(this, width, height);
     this.board.createBoard();
     this.camera.setCamera();
-    this.renderer.renderGame();
+    this.renderer.renderGame(this.scene,this.camera);
     windowResize(this.camera, this.renderer);
   }
 
   refreshLevelsSelection = () => {
     this.player.levelCompleted();
+    console.log(this.levels)
     refreshSelectOptions(this.levels.length, this.player.level);
     showSelectLevel();
   };
@@ -84,7 +81,8 @@ export class Game {
   retrieveLevels = () => {
     getLevels()
       .done((res) => {
-        const levels = res.levels;
+        console.log(JSON.parse(res))
+        const levels = JSON.parse(res).levels;
         this.levels = levels;
         this.refreshLevelsSelection();
         Loading.getInstance().setLevelsLoaded(true);

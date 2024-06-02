@@ -6,4 +6,5 @@ export type Level = {
   map: Map;
   waves: Wave[];
   startingCoords: Coord[];
+  endingCoords: Coord[];
 };

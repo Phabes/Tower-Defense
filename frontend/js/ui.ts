@@ -4,7 +4,6 @@ import { Renderer } from "./renderer";
 import { Tower } from "./tower";
 import { Player } from "./player";
 import { Upgrade } from "./upgrade";
-import { Variant } from "./types";
 import { Loading } from "./loading";
 import { Variant } from "./types";
 import { Game } from "./game";
@@ -66,15 +65,11 @@ export const boardOffClick = () => {
   getBoardElement().off("click");
 };
 
-export const refreshSelectOptions = (
+
 export const refreshSelectOptions = (
   possibleLevels: number,
   playerLevel: number
-) => {
-  const select = $("#levelSelect");
-  select.empty();
-  playerLevel: number
-) => {
+) =>  {
   const select = $("#levelSelect");
   select.empty();
 

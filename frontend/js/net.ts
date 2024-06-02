@@ -12,13 +12,16 @@ export const getLevels = () => {
 
 
 export const postLevel = (level:Level) => {
-  return $.post("http://localhost:4000/levels/newlevel",level)
+  console.log(JSON.stringify(level))
+  // return $.post("http://localhost:4000/levels/newlevel",JSON.stringify(level))
   return $.ajax({
     url: "http://localhost:4000/levels/newlevel",
     method: "post",
     dataType: "json",
     contentType: "application/json",
-    data:JSON.stringify(level)
+    traditional: true,
+    data:JSON.stringify(level),
+    processData:false
   });
 
   

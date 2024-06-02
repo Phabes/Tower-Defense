@@ -139,7 +139,22 @@ export class Board {
     this.enemiesGroup.clear();
     this.enemies = [];
   };
-
+  isStartingField = (coord:Coord):boolean =>{
+    for (let i = 0; i < this.level.startingCoords.length; i++) {
+      const element = this.level.startingCoords[i];
+      if (coord.x == element.x && coord.y == element.y)
+        return true
+    }
+    return false
+  }
+  isEndingField = (coord: Coord): boolean => {
+    for (let i = 0; i < this.level.endingCoords.length; i++) {
+      const element = this.level.endingCoords[i];
+      if (coord.x == element.x && coord.y == element.y)
+        return true;
+    }
+    return false
+  }
   createBoard = () => {
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
@@ -150,11 +165,13 @@ export class Board {
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
         const fieldType = this.level.map[i][j].type;
+        const startField = this.isStartingField(coord)
+        const endField = this.isEndingField(coord)
         const field =
           fieldType == "building"
             ? new Building(coord, fieldType)
             : fieldType == "path"
-            ? new Path(coord, fieldType)
+              ? new Path(coord, fieldType, startField, endField)
             : new Field(coord, fieldType);
         if (fieldType == "building") {
           const building = field as Building;

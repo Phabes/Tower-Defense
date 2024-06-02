@@ -16,11 +16,11 @@ export class BoardCreator extends Board {
   height:number;
   onlyPath:boolean = false;
   choosingStart:boolean = false;
-  startCoords:Coord;
+  startCoords:Coord[] = [];
   choosingEnd:boolean = false;
-  endCoords:Coord;
+  endCoord:Coord|undefined;
   lastChoosenField:Path | undefined;
-  fieldNextCoords: Coord[][][];
+  parents: Coord[][][]
 
   constructor(game: Game, width: number, height: number) {
     super(game)
@@ -70,7 +70,7 @@ export class BoardCreator extends Board {
           this.boardGroup.remove(this.fields[coord.y][coord.x].elementsOnField)
           switch (getFieldPickerType()){
             case "path":
-              this.fields[coord.y][coord.x] = new Path(coord, "path")
+              this.fields[coord.y][coord.x] = new Path(coord, "path", false, false)
               break;
             case "building":
               this.fields[coord.y][coord.x] = new Building(coord, "building")
@@ -82,21 +82,45 @@ export class BoardCreator extends Board {
               console.log("Non");
               break;
           }
-          this.boardGroup.add(this.fields[coord.y][coord.x].createField(this.width))
+          this.boardGroup.add(this.fields[coord.y][coord.x].createField(this.height))
         } else if (this.onlyPath && object instanceof Path){
           const coord = object.getCoords();
           if(this.choosingStart){
             if (this.lastChoosenField != undefined)
-              this.lastChoosenField.changeColor("default");
+              this.lastChoosenField.colorField(false);
             this.lastChoosenField = object;
-            object.changeColor("start");
-            this.startCoords = coord;
-          }else if(this.choosingEnd && this.startCoords != coord){
+            if(object.isStartField){
+              object.isStartField = false;
+              this.boardGroup.remove(object.elementsOnField)
+              this.boardGroup.add(object.createField(this.height))
+              const ind = this.startCoords.indexOf(coord,0)
+              if(ind>-1)
+                this.startCoords.splice(ind,1)
+            }else{
+              object.turnToStartingField(this.height);
+              this.startCoords.push(coord);
+            }
+            console.log(this.startCoords)
+          }else if(this.choosingEnd && !this.startCoords.includes(coord)){
             if (this.lastChoosenField != undefined)
-              this.lastChoosenField.changeColor("default");
+              this.lastChoosenField.colorField(false);
             this.lastChoosenField = object;
-            object.changeColor("end");
-            this.endCoords = coord;
+            if(object.isEndField){
+              object.isEndField = false;
+              this.boardGroup.remove(object.elementsOnField);
+              this.boardGroup.add(object.createField(this.height));
+              this.endCoord = undefined;
+            }else{
+              let oldCoords = this.endCoord
+              if (oldCoords){
+                let old = this.fields[oldCoords.y][oldCoords.x] as Path
+                old.isEndField = false;
+                this.boardGroup.remove(old.elementsOnField);
+                this.boardGroup.add(old.createField(this.height));
+              }
+              object.turnToEndingField(this.height);
+              this.endCoord=coord;
+            }
           }
         }
       }
@@ -106,7 +130,6 @@ export class BoardCreator extends Board {
   
 
   createBoard = () => {
-    console.log("Control")
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
 
@@ -154,7 +177,7 @@ export class BoardCreator extends Board {
   }
 
   acceptStartField = ():boolean=>{
-    if(!this.startCoords){
+    if(this.startCoords.length==0){
       alertPopup("Choose starting field.")
       return false;
     }
@@ -165,7 +188,7 @@ export class BoardCreator extends Board {
   }
 
   acceptEndField = ():boolean => {
-    if (!this.endCoords) {
+    if (!this.endCoord) {
       alertPopup("Choose end field.");
       return false;
     }
@@ -181,89 +204,112 @@ export class BoardCreator extends Board {
     return true;
   }
 
-  createPath = ():boolean =>{
-    if(!this.startCoords || !this.endCoords)
+  createPath = async ():Promise<boolean> =>{
+    if(this.startCoords.length==0 || !this.endCoord)
       return false;
-    const parents:Coord[][][] = new Array(this.height)
+    this.parents = new Array(this.height)
     for (let i = 0; i < this.height; i++) {
-      parents[i]= new Array(this.height);
+      this.parents[i]= new Array(this.height);
       for (let j = 0; j < this.width; j++) {
-        parents[i][j] = new Array<Coord>();
+        this.parents[i][j] = new Array<Coord>();
       }
     }
-    
-    parents[this.startCoords.y][this.startCoords.x].push(this.startCoords)
-
-    const nextCoords:Coord[]=[]
-    nextCoords.push(this.startCoords)
-    const diffs = [{ y: 0, x: -1 }, { y: 0, x: 1 }, { y: -1, x: 0 }, { y: 1, x: 0 }]
-    while (nextCoords.length>0){
-      //@ts-ignore
-      let current:Coord = nextCoords.shift()
+    console.log(this.startCoords ,this.endCoord)
+    const diffs = [{ y: 0, x: -1 }, { y: 0, x: 1 }, { y: -1, x: 0 }, { y: 1, x: 0 }];
+    const nextCoords: Coord[] = [];
+    nextCoords.push(this.endCoord);
+    while (nextCoords.length > 0) {
+      let current: Coord = nextCoords.shift();
       for (let i = 0; i < diffs.length; i++) {
         const diff = diffs[i];
-        let coord: Coord = { y: current.y + diff.y, x: current.x + diff.x }
+        let coord: Coord = { y: current.y + diff.y, x: current.x + diff.x };
         if (coord.x < 0 || coord.x >= this.width || coord.y < 0 || coord.y >= this.height)
           continue;
         if (this.fields[coord.y][coord.x] instanceof Path) {
-
-          if (parents[coord.y][coord.x].length == 0 && !CoordEquals(this.endCoords, { y: coord.y, x: coord.x })) {
+          if (this.parents[coord.y][coord.x].length == 0 && !this.startCoords.some(e => CoordEquals(e,coord)) && !CoordEquals(coord,this.endCoord)) {
             nextCoords.push(coord);
           }
-
-          let IsNotParent = true;
-          parents[current.y][current.x].forEach(parent => {
-            if (CoordEquals(parent, coord))
-              IsNotParent = false;
-          });
-
-          if (IsNotParent)
-            parents[coord.y][coord.x].push(current);
-        }
+          if (!this.parents[current.y][current.x].some(e => CoordEquals(e, coord)))
+            this.parents[coord.y][coord.x].push(current);
       }
-      
+     
     }
-
-    if(parents[this.endCoords.y][this.endCoords.x].length == 0)
-      return false
-
-    this.fieldNextCoords = new Array(this.height);
-    for (let i = 0; i < this.height; i++) {
-      this.fieldNextCoords[i] = new Array(this.height);
-      for (let j = 0; j < this.width; j++) {
-        this.fieldNextCoords[i][j] = new Array<Coord>();
-      }
+    
     }
-    nextCoords.push(this.endCoords)
-    while (nextCoords.length > 0) {
-      //@ts-ignore
-      let current: Coord = nextCoords.shift()
-      if(CoordEquals(this.startCoords, current))
-        continue
-      parents[current.y][current.x].forEach(coord => {
-        if (this.fieldNextCoords[coord.y][coord.x].length==0)
-          nextCoords.push(coord)
-        this.fieldNextCoords[coord.y][coord.x].push(current)
-      });
-    }
-    return true
+    return true 
   }
-
-  save = () =>{
+  save = () => {
     const map: Square[][] = new Array(this.height);
     for (let i = 0; i < this.height; i++) {
       map[i] = new Array(this.width);
       for (let j = 0; j < this.width; j++) {
-        map[i][j] = {type:this.fields[i][j].type, nextCoords:this.fieldNextCoords[i][j]}
+        map[i][j] = { type: this.fields[i][j].type, nextCoords: this.parents[i][j] };
       }
     }
-    const level = {
-      map:map,
-      waves:[{timer:10,enemies:10}],
-      startingCoords:[this.startCoords]
-    }
-      postLevel(level);
+    if (!this.endCoord)
+      return
+    const level:Level = {
+      map: map,
+      waves: [{ timer: 10, enemies: 10 }],
+      startingCoords: [...this.startCoords],
+      endingCoords:[this.endCoord]
+    };
+    console.log(level)
+    postLevel(level);
   }
-
-
 }
+
+// parents[this.startCoords.y][this.startCoords.x].push(this.startCoords);
+
+// const nextCoords: Coord[] = [];
+// nextCoords.push(this.startCoords);
+// const diffs = [{ y: 0, x: -1 }, { y: 0, x: 1 }, { y: -1, x: 0 }, { y: 1, x: 0 }];
+// while (nextCoords.length > 0) {
+//   //@ts-ignore
+//   let current: Coord = nextCoords.shift();
+//   for (let i = 0; i < diffs.length; i++) {
+//     const diff = diffs[i];
+//     let coord: Coord = { y: current.y + diff.y, x: current.x + diff.x };
+//     if (coord.x < 0 || coord.x >= this.width || coord.y < 0 || coord.y >= this.height)
+//       continue;
+//     if (this.fields[coord.y][coord.x] instanceof Path) {
+
+//       if (parents[coord.y][coord.x].length == 0 && !CoordEquals(this.endCoords, { y: coord.y, x: coord.x })) {
+//         nextCoords.push(coord);
+//       }
+
+      // let IsNotParent = true;
+      // parents[current.y][current.x].forEach(parent => {
+      //   if (CoordEquals(parent, coord))
+      //     IsNotParent = false;
+      // });
+
+      // if (IsNotParent)
+      //   parents[coord.y][coord.x].push(current);
+//     }
+//   }
+
+// }
+
+// if (parents[this.endCoords.y][this.endCoords.x].length == 0)
+//   return false;
+
+// this.fieldNextCoords = new Array(this.height);
+// for (let i = 0; i < this.height; i++) {
+//   this.fieldNextCoords[i] = new Array(this.height);
+//   for (let j = 0; j < this.width; j++) {
+//     this.fieldNextCoords[i][j] = new Array<Coord>();
+//   }
+// }
+// nextCoords.push(this.endCoords);
+// while (nextCoords.length > 0) {
+//   //@ts-ignore
+//   let current: Coord = nextCoords.shift();
+//   if (CoordEquals(this.startCoords, current))
+//     continue;
+//   parents[current.y][current.x].forEach(coord => {
+//     if (this.fieldNextCoords[coord.y][coord.x].length == 0)
+//       nextCoords.push(coord);
+//     this.fieldNextCoords[coord.y][coord.x].push(current);
+//   });
+// }

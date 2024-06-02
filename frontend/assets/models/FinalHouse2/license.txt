@@ -1,0 +1,8 @@
+Model Information:
+* title:	low poly home 1
+* source:	https://sketchfab.com/3d-models/low-poly-home-1-750826b0bdab4d97a32ae1680a5e7e02
+* author:	Digital screen official (https://sketchfab.com/ck212575)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

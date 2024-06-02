@@ -1,0 +1,8 @@
+Model Information:
+* title:	Castle
+* source:	https://sketchfab.com/3d-models/castle-eb33fd7424ed414ca0dce8a176fb8893
+* author:	Misam Ali Rizvi (https://sketchfab.com/MisamAliRizvi)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

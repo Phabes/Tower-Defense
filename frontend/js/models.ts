@@ -11,6 +11,8 @@ export class Models {
   private towerModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private treeModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private houseModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
+  private barnModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
+  private castleModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private bulletModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh;
   private grassTexture: THREE.Texture | undefined;
   private pathTexture: THREE.Texture | undefined;
@@ -42,6 +44,22 @@ export class Models {
     const houseMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
     this.houseModel = new THREE.Mesh(houseGeometry, houseMaterial);
 
+    const barnGeometry = new THREE.BoxGeometry(
+      settings.BARN_DEFAULT_SIZE,
+      settings.BARN_DEFAULT_SIZE,
+      settings.BARN_DEFAULT_SIZE
+    );
+    const barnMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
+    this.barnModel = new THREE.Mesh(barnGeometry, barnMaterial);
+
+    const castleGeometry = new THREE.BoxGeometry(
+      settings.CASTLE_DEFAULT_SIZE,
+      settings.CASTLE_DEFAULT_SIZE,
+      settings.CASTLE_DEFAULT_SIZE
+    );
+    const castleMaterial = new THREE.MeshBasicMaterial({ color: 0xf59440 });
+    this.castleModel = new THREE.Mesh(castleGeometry, castleMaterial);
+
     const bulletGeometry = new THREE.SphereGeometry(settings.BULLET_SIZE);
     const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0x34deeb });
     this.bulletModel = new THREE.Mesh(bulletGeometry, bulletMaterial);
@@ -53,6 +71,8 @@ export class Models {
           this.enemyModel,
           this.treeModel,
           this.houseModel,
+          this.barnModel,
+          this.castleModel,
           this.bulletModel,
           this.grassTexture,
           this.pathTexture,
@@ -65,6 +85,10 @@ export class Models {
         this.towerModel.rotation.set(Math.PI / 2, 0, 0);
 
         this.houseModel.rotation.set(Math.PI / 2, 0, 0);
+
+        this.barnModel.rotation.set(Math.PI / 2, 0, 0);
+
+        this.castleModel.rotation.set(Math.PI / 2, -1*Math.PI/2, 0);
 
         this.treeModel.rotation.set(Math.PI / 2, 0, 0);
 
@@ -105,6 +129,12 @@ export class Models {
         return res.scene;
       }),
       gltfLoader.loadAsync("../assets/models/House/scene.gltf").then((res) => {
+        return res.scene;
+      }),
+      gltfLoader.loadAsync("../assets/models/Barn/scene.gltf").then((res) => {
+        return res.scene;
+      }),
+      gltfLoader.loadAsync("../assets/models/FinalHouse/scene.gltf").then((res) => {
         return res.scene;
       }),
       gltfLoader
@@ -169,6 +199,38 @@ export class Models {
     }
 
     container.add(houseCopy);
+    return container;
+  };
+  
+  getBarnModelClone = () => {
+    const container = new THREE.Object3D();
+    const barnCopy = SkeletonUtils.clone(this.barnModel);
+
+    if (this.modelsLoaded) {
+      const scalar =
+        Math.floor(
+          Math.random() * (settings.BARN_MAX_SCALE - settings.BARN_MIN_SCALE)
+        ) + settings.BARN_MIN_SCALE;
+      barnCopy.scale.setScalar(scalar);
+    }
+
+    container.add(barnCopy);
+    return container;
+  };
+
+  getCastleModelClone = () => {
+    const container = new THREE.Object3D();
+    const castleCopy = SkeletonUtils.clone(this.castleModel);
+
+    if (this.modelsLoaded) {
+      const scalar =
+        Math.floor(
+          Math.random() * (settings.CASTLE_MAX_SCALE - settings.CASTLE_MIN_SCALE)
+        ) + settings.CASTLE_MIN_SCALE;
+      castleCopy.scale.setScalar(scalar);
+    }
+
+    container.add(castleCopy);
     return container;
   };
 

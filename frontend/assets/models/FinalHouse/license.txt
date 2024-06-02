@@ -1,0 +1,8 @@
+Model Information:
+* title:	School Building - Poppy Playtime
+* source:	https://sketchfab.com/3d-models/school-building-poppy-playtime-29e72bd799a14417a183567336fe80df
+* author:	MG Rips (https://sketchfab.com/MG_GameRips)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
