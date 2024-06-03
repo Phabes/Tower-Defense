@@ -5,7 +5,6 @@ import { Tower } from "../tower";
 import { showTowerPanel } from "../ui";
 import { Player } from "../player";
 import { settings } from "../settings";
-import { Models } from "../models";
 
 export class Building extends Field {
   tower: Tower;
@@ -42,7 +41,7 @@ export class Building extends Field {
       settings.FIELD_SIZE,
       settings.FIELD_SIZE
     );
-    this.colorField(false);
+    this.colorField();
     this.position.set(
       this.coord.x * (settings.FIELD_SIZE + settings.SPACE_BETWEEN) +
         settings.FIELD_SIZE / 2,

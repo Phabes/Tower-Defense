@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { settings } from "./settings";
 import { Enemy } from "./enemy";
 import { Field } from "./fields/field";
@@ -17,7 +16,6 @@ import {
   towerHover,
 } from "./ui";
 import { Tower } from "./tower";
-import { event } from "jquery";
 
 export class Board {
   game: Game;
@@ -53,11 +51,11 @@ export class Board {
     this.enemiesGroup = new THREE.Group();
     this.raycaster = new THREE.Raycaster();
     this.selectedField = null;
-
+    this.hoveredField = null;
   }
 
-  onHover = (event: JQuery.MouseEnterEvent)=>{
-    const pointer = this.getMouseVector2(event)
+  onHover = (event: JQuery.MouseEnterEvent) => {
+    const pointer = this.getMouseVector2(event);
     this.raycaster.setFromCamera(pointer, this.game.camera);
     const intersects = this.raycaster.intersectObjects(
       this.boardGroup.children
@@ -65,20 +63,30 @@ export class Board {
     if (intersects.length > 0) {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
-        if (object instanceof Field ) {
-          if (object.type != "path" && object != this.hoveredField)
-          {
-            this.hoveredField?.colorField()
-            this.hoveredField = object
-            object.highlight()
-          }
-        } 
+        if (object instanceof Building) {
+          object.fieldHover();
+        }
       }
     }
-  }
+    if (intersects.length > 0) {
+      for (let i = 0; i < intersects.length; i++) {
+        const object = intersects[i].object;
+        if (object instanceof Field) {
+          if (object != this.hoveredField) {
+            this.hoveredField?.colorField();
+            this.hoveredField = object;
+            object.highlight();
+          }
+        }
+      }
+    } else {
+      this.hoveredField?.colorField();
+      this.hoveredField = null;
+    }
+  };
 
   click = (event: JQuery.ClickEvent) => {
-    const pointer = this.getMouseVector2(event)
+    const pointer = this.getMouseVector2(event);
     this.raycaster.setFromCamera(pointer, this.game.camera);
 
     const intersects = this.raycaster.intersectObjects(
@@ -119,6 +127,8 @@ export class Board {
         tower.hovered(false);
       }
     }
+    if (this.hoveredField) {
+    }
     if (intersects.length > 0) {
       for (let i = 0; i < intersects.length; i++) {
         const object = intersects[i].object;
@@ -139,39 +149,40 @@ export class Board {
     this.enemiesGroup.clear();
     this.enemies = [];
   };
-  isStartingField = (coord:Coord):boolean =>{
+
+  isStartingField = (coord: Coord): boolean => {
     for (let i = 0; i < this.level.startingCoords.length; i++) {
       const element = this.level.startingCoords[i];
-      if (coord.x == element.x && coord.y == element.y)
-        return true
+      if (coord.x == element.x && coord.y == element.y) return true;
     }
-    return false
-  }
+    return false;
+  };
+
   isEndingField = (coord: Coord): boolean => {
     for (let i = 0; i < this.level.endingCoords.length; i++) {
       const element = this.level.endingCoords[i];
-      if (coord.x == element.x && coord.y == element.y)
-        return true;
+      if (coord.x == element.x && coord.y == element.y) return true;
     }
-    return false
-  }
+    return false;
+  };
+
   createBoard = () => {
     this.clearBoard();
     this.setGroupPosition(this.boardGroup);
-    
+
     const mapSizeY = this.level.map.length;
     for (let i = 0; i < this.level.map.length; i++) {
       const row: Field[] = [];
       for (let j = 0; j < this.level.map[i].length; j++) {
         const coord = { y: i, x: j };
         const fieldType = this.level.map[i][j].type;
-        const startField = this.isStartingField(coord)
-        const endField = this.isEndingField(coord)
+        const startField = this.isStartingField(coord);
+        const endField = this.isEndingField(coord);
         const field =
           fieldType == "building"
             ? new Building(coord, fieldType)
             : fieldType == "path"
-              ? new Path(coord, fieldType, startField, endField)
+            ? new Path(coord, fieldType, startField, endField)
             : new Field(coord, fieldType);
         if (fieldType == "building") {
           const building = field as Building;
@@ -188,7 +199,7 @@ export class Board {
     boardClick(this.click);
     towerHover(this.hover);
 
-    boardMouseMove(this.onHover)
+    boardMouseMove(this.onHover);
     this.animate();
   };
 
@@ -251,7 +262,6 @@ export class Board {
     this.setGroupPosition(this.enemiesGroup);
     this.game.scene.add(this.enemiesGroup);
 
-    
     for (let i = 0; i < numberOfEnemies; i++) {
       const startField = this.getRandomFirstField();
       const enemy = new Enemy(
@@ -376,15 +386,14 @@ export class Board {
     this.game.renderer.renderGame(this.game.scene, this.game.camera);
   };
 
-  getMouseVector2 = (event: JQuery.MouseEventBase) =>{
-
+  getMouseVector2 = (event: JQuery.MouseEventBase) => {
     const pointer = new THREE.Vector2();
     const boardElement = getBoardElement();
     pointer.x = (event.clientX / boardElement.width()!) * 2 - 1;
     pointer.y = -(event.clientY / boardElement.height()!) * 2 + 1;
 
     return pointer;
-  }
+  };
   // createPlayerStats = () => {
   //   this.createHeart();
   //   this.createCoin();

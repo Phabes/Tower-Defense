@@ -4,14 +4,11 @@ import { Board } from "./board";
 import { Player } from "./player";
 import {
   refreshSelectOptions,
-  removeLoading,
   removeWelcome,
   showAlert,
   showSelectLevel,
   startButtonClick,
-
   welcomeButtonsHandler,
-
   windowResize,
 } from "./ui";
 import { Camera } from "./camera";
@@ -31,7 +28,7 @@ export class Game {
   renderer: Renderer;
   controls: Controls;
   player: Player;
-  board: Board;
+  board: Board | undefined;
 
   constructor(
     scene: THREE.Scene,
@@ -48,32 +45,28 @@ export class Game {
     this.controls = controls;
     this.player = new Player(10, 500);
 
+    this.retrieveLevels();
     welcomeButtonsHandler(this);
   }
 
   startGame = () => {
     removeWelcome();
-    this.board = new Board(this)
-    this.retrieveLevels();
+    this.board = new Board(this);
     windowResize(this.camera, this.renderer);
     startButtonClick(this.prepareGame);
-  }
+  };
 
-  
-
-  startLevelCreator = (width:number, height:number) => {
-    if (this.board)
-      this.board.clearBoard()
+  startLevelCreator = (width: number, height: number) => {
+    if (this.board) this.board.clearBoard();
     this.board = new BoardCreator(this, width, height);
     this.board.createBoard();
     this.camera.setCamera();
-    this.renderer.renderGame(this.scene,this.camera);
+    this.renderer.renderGame(this.scene, this.camera);
     windowResize(this.camera, this.renderer);
-  }
+  };
 
   refreshLevelsSelection = () => {
     this.player.levelCompleted();
-    console.log(this.levels)
     refreshSelectOptions(this.levels.length, this.player.level);
     showSelectLevel();
   };
@@ -81,7 +74,6 @@ export class Game {
   retrieveLevels = () => {
     getLevels()
       .done((res) => {
-        console.log(JSON.parse(res))
         const levels = JSON.parse(res).levels;
         this.levels = levels;
         this.refreshLevelsSelection();
@@ -105,6 +97,9 @@ export class Game {
   };
 
   prepareGame = (index: number) => {
+    if (this.board === undefined) {
+      return;
+    }
     this.board.setLevel(this.levels[index]);
     this.board.createBoard();
     this.camera.setCamera();
@@ -113,6 +108,9 @@ export class Game {
   };
 
   startRound = () => {
+    if (this.board === undefined) {
+      return;
+    }
     this.board.startRound();
   };
 
