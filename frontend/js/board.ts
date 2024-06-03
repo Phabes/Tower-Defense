@@ -251,8 +251,9 @@ export class Board {
     this.setGroupPosition(this.enemiesGroup);
     this.game.scene.add(this.enemiesGroup);
 
-    const startField = this.getRandomFirstField();
+    
     for (let i = 0; i < numberOfEnemies; i++) {
+      const startField = this.getRandomFirstField();
       const enemy = new Enemy(
         settings.ENEMY_HP,
         settings.ENEMY_SPEED,
