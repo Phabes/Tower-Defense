@@ -1,14 +1,6 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
-import {
-  boardClick,
-  boardMouseMove,
-  getBoardElement,
-  getFieldPickerType,
-  acceptCreatedLevel,
-  showAlert,
-  alertPopup,
-} from "./ui";
+import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType, acceptCreatedLevel, showAlert,alertPopup, vaweCreation, showWelcome, getCreatedVawes, removeWaveMaker, refreshPage } from "./ui";
 import { Game } from "./game";
 import { Board } from "./board";
 import { settings } from "./settings";
@@ -28,6 +20,7 @@ export class BoardCreator extends Board {
   endCoord: Coord | undefined;
   lastChoosenField: Path | undefined;
   parents: Coord[][][] = [[[]]];
+
 
   constructor(game: Game, width: number, height: number) {
     super(game);
@@ -113,6 +106,7 @@ export class BoardCreator extends Board {
               this.startCoords.push(coord);
             }
           } else if (this.choosingEnd && !this.startCoords.includes(coord)) {
+
             if (this.lastChoosenField != undefined)
               this.lastChoosenField.colorField();
             this.lastChoosenField = object;
@@ -174,10 +168,16 @@ export class BoardCreator extends Board {
     this.fields = [];
   };
 
-  acceptBoard = () => {
+  acceptBoard = ():boolean =>{
+    if(!this.fields.some(e=>e.some(field=>field.type=="building"))){
+      alertPopup("At least one place for tower has to be on map.");
+      return false;
+    }
     this.onlyPath = true;
     this.choosingStart = true;
-  };
+    return true;
+  }
+
 
   acceptStartField = (): boolean => {
     if (this.startCoords.length == 0) {
@@ -202,7 +202,7 @@ export class BoardCreator extends Board {
       alertPopup("There is no continues path between start and end.");
       return false;
     }
-    this.save();
+    vaweCreation(this);
     return true;
   };
 
@@ -215,16 +215,15 @@ export class BoardCreator extends Board {
         this.parents[i][j] = new Array<Coord>();
       }
     }
-    const diffs = [
-      { y: 0, x: -1 },
-      { y: 0, x: 1 },
-      { y: -1, x: 0 },
-      { y: 1, x: 0 },
-    ];
+
+    const diffs = [{ y: 0, x: -1 }, { y: 0, x: 1 }, { y: -1, x: 0 }, { y: 1, x: 0 }];
+
     const nextCoords: Coord[] = [];
     nextCoords.push(this.endCoord);
     while (nextCoords.length > 0) {
-      let current: Coord = nextCoords.shift();
+      let current: Coord | undefined= nextCoords.shift();
+      if(!current)
+        continue
       for (let i = 0; i < diffs.length; i++) {
         const diff = diffs[i];
         let coord: Coord = { y: current.y + diff.y, x: current.x + diff.x };
@@ -256,6 +255,11 @@ export class BoardCreator extends Board {
   };
 
   save = () => {
+    const waves = getCreatedVawes();
+    if(waves.length==0){
+      alertPopup("At least one wave has to be created.");
+      return false;
+    }
     const map: Square[][] = new Array(this.height);
     for (let i = 0; i < this.height; i++) {
       map[i] = new Array(this.width);
@@ -269,66 +273,24 @@ export class BoardCreator extends Board {
     if (!this.endCoord) return;
     const level: Level = {
       map: map,
-      waves: [{ timer: 10, enemies: 10 }],
+      waves: waves,
       startingCoords: [...this.startCoords],
       endingCoords: [this.endCoord],
     };
 
-    postLevel(level);
-  };
+    removeWaveMaker();
+    showWelcome();
+    postLevel(level)
+    .done((res) => {
+      alertPopup("Your map has been saved on the server.");
+    })
+    .catch((error) => {
+      if(error.status==200)
+        alertPopup("Your map has been saved on the server.");
+      else
+        alertPopup("Your map has not been saved on the server.");
+      refreshPage();
+    });
+    
+  }
 }
-
-// parents[this.startCoords.y][this.startCoords.x].push(this.startCoords);
-
-// const nextCoords: Coord[] = [];
-// nextCoords.push(this.startCoords);
-// const diffs = [{ y: 0, x: -1 }, { y: 0, x: 1 }, { y: -1, x: 0 }, { y: 1, x: 0 }];
-// while (nextCoords.length > 0) {
-//   //@ts-ignore
-//   let current: Coord = nextCoords.shift();
-//   for (let i = 0; i < diffs.length; i++) {
-//     const diff = diffs[i];
-//     let coord: Coord = { y: current.y + diff.y, x: current.x + diff.x };
-//     if (coord.x < 0 || coord.x >= this.width || coord.y < 0 || coord.y >= this.height)
-//       continue;
-//     if (this.fields[coord.y][coord.x] instanceof Path) {
-
-//       if (parents[coord.y][coord.x].length == 0 && !CoordEquals(this.endCoords, { y: coord.y, x: coord.x })) {
-//         nextCoords.push(coord);
-//       }
-
-// let IsNotParent = true;
-// parents[current.y][current.x].forEach(parent => {
-//   if (CoordEquals(parent, coord))
-//     IsNotParent = false;
-// });
-
-// if (IsNotParent)
-//   parents[coord.y][coord.x].push(current);
-//     }
-//   }
-
-// }
-
-// if (parents[this.endCoords.y][this.endCoords.x].length == 0)
-//   return false;
-
-// this.fieldNextCoords = new Array(this.height);
-// for (let i = 0; i < this.height; i++) {
-//   this.fieldNextCoords[i] = new Array(this.height);
-//   for (let j = 0; j < this.width; j++) {
-//     this.fieldNextCoords[i][j] = new Array<Coord>();
-//   }
-// }
-// nextCoords.push(this.endCoords);
-// while (nextCoords.length > 0) {
-//   //@ts-ignore
-//   let current: Coord = nextCoords.shift();
-//   if (CoordEquals(this.startCoords, current))
-//     continue;
-//   parents[current.y][current.x].forEach(coord => {
-//     if (this.fieldNextCoords[coord.y][coord.x].length == 0)
-//       nextCoords.push(coord);
-//     this.fieldNextCoords[coord.y][coord.x].push(current);
-//   });
-// }

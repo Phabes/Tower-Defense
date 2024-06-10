@@ -439,3 +439,54 @@ body {
 #boardFields input[type="radio"] {
   display: none;
 }
+
+#waveMaker{
+display: none;
+flex-flow: column;
+height: 100%;
+}
+.waveContainer{
+  display: flex;
+  flex-flow: row;
+  height: 40px;
+  justify-content: space-around;
+}
+.waveContainer div{
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.waveContainer img,.waveContainer div:last-of-type {
+  width: 20%;
+  
+}
+.waveContainer img{
+  object-fit: scale-down;
+  cursor: pointer;
+}
+
+.waveInputs{
+  max-width: 130px;
+}
+
+#waveCreationDisplay{
+  flex-grow: 1;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.waveHeader{
+  position: sticky;
+  font-weight: bold;
+  font-size: large;
+  border-bottom: 2px solid black;
+}
+.waveItem{
+  border:1px dashed black;
+}
+#acceptVawes{
+  margin:10px;
+  background-color: #08a3c2;
+  color: white;
+}

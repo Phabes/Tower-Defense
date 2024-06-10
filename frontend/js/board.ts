@@ -249,7 +249,7 @@ export class Board {
   prepareRound = (round: number) => {
     this.round = round;
     showPlayerStats(this.game.player);
-    setTimer(this.level.waves[this.round].timer, this.startRound);
+    setTimer(10, this.startRound);
   };
 
   startRound = () => {
@@ -280,12 +280,13 @@ export class Board {
     this.spawnEnemiesInterval = setInterval(() => {
       index++;
       if (index == numberOfEnemies) {
+        console.log("cleared")
         clearInterval(this.spawnEnemiesInterval);
         return;
       }
       this.enemiesGroup.add(this.enemies[index].spawn());
       this.enemies[index].setAlive(true);
-    }, 1000);
+    }, this.level.waves[this.round].timer*1000);
   };
 
   removeEnemy = (enemy: Enemy) => {
