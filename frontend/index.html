@@ -15,6 +15,7 @@
               <div class="playerIcon">
                 <img src="./assets/images/heart.png" alt="heart" />
               </div>
+              
               <div class="emphasis" id="hpValue"></div>
             </div>
             <div class="playerInfo" id="money">
@@ -53,13 +54,14 @@
         </div>
         <div class="fullPanel" id="creator">
           <div id="boardSize" class="panelContent">
+            <span class="emphasisTitle">Map size</span>
             <table>
               <tr>
-                <td>Width:</td>
+                <td class="emphasis">Width:</td>
                 <td><input type="number" id="newBoardWidth" min="1" /></td>
               </tr>
               <tr>
-                <td>Height:</td>
+                <td class="emphasis">Height:</td>
                 <td><input type="number" id="newBoardHeight" min="1" /></td>
               </tr>
             </table>
@@ -77,7 +79,7 @@
                     checked
                   />
                 </td>
-                <td>PATH</td>
+                <td class="emphasisTitle">PATH</td>
               </tr>
               <tr id="towerFieldPicker">
                 <td>
@@ -88,7 +90,7 @@
                     value="building"
                   />
                 </td>
-                <td>TOWER</td>
+                <td class="emphasisTitle">TOWER</td>
               </tr>
               <tr id="grassFieldPicker">
                 <td>
@@ -99,18 +101,52 @@
                     value="grass"
                   />
                 </td>
-                <td>GRASS</td>
+                <td class="emphasisTitle">GRASS</td>
               </tr>
             </table>
             <div class="gameButton" id="acceptBoard">ACCEPT BOARD</div>
           </div>
           <div class="panelContent" id="startFieldPicker">
-            <span>Choose starting field</span>
+            <span class="emphasisTitle">Choose starting field</span>
             <div class="gameButton" id="acceptStartField">ACCEPT</div>
           </div>
           <div class="panelContent" id="endFieldPicker">
-            <span>Choose end field</span>
+            <span class="emphasisTitle">Choose end field</span>
             <div class="gameButton" id="acceptEndField">ACCEPT</div>
+          </div>
+          <div id="waveMaker">
+            <div class="gameButton" id="acceptVawes">SAVE MAP</div>
+            <span class="emphasisTitle">Create vawes</span>
+            <table>
+              <tr>
+                <td class="emphasis">Spawn rate:</td>
+                <td><input type="number" class="waveInputs" id="waveTimeInput" min="1" /></td>
+              </tr>
+              <tr>
+                <td class="emphasis">Enemies:</td>
+                <td><input type="number" class="waveInputs" id="waveEnemiesInput" min="1" /></td>
+              </tr>
+            </table>
+            <div class="gameButton" id="createVaweButton">CREATE VAWE</div>
+            <div id="waveCreationDisplay">
+              <div class="waveContainer waveHeader">
+                <div>Spawn rate</div>
+                <div>Enemies</div>
+                <div></div>
+              </div>
+              <div class="waveItem waveContainer">
+                <div class="waveTime">13</div>
+                <div class="waveEnemies">12</div><img src="./assets/images/delete.png" alt="delete" class="vaweDeleteIcon">
+              </div>
+              <div class="waveItem waveContainer">
+                <div class="waveTime">14</div>
+                <div class="waveEnemies">12</div><img src="./assets/images/delete.png" alt="delete" class="vaweDeleteIcon">
+              </div>
+              <div class="waveItem waveContainer">
+                <div class="waveTime">15</div>
+                <div class="waveEnemies">12</div><img src="./assets/images/delete.png" alt="delete" class="vaweDeleteIcon">
+              </div>
+            </div>
           </div>
         </div>
         <div class="fullPanel" id="welcome">

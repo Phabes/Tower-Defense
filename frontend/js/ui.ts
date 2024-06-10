@@ -31,14 +31,19 @@ export const setErrorMessage = (message: string) => {
   $("#errorMessage").text(message);
 };
 export const removeWelcome = () => {
-  $("#welcome").remove();
+  $("#welcome").css("display","none");
 };
+
+export const showWelcome = () =>{
+  $("#welcome").css("display", "block");;
+}
 
 export const showCreator = () => {
   $("#creator").css({ display: "block" });
 };
 
 export const windowResize = (camera: Camera, renderer: Renderer) => {
+  
   $(window).on("resize", () => {
     const boardElement = getBoardElement();
     camera.aspect = boardElement.width()! / boardElement.height()!;
@@ -322,11 +327,11 @@ export const acceptCreatedLevel = (board: BoardCreator) => {
   const acceptBoardButton = $("#acceptBoard");
   const acceptStartFieldButton = $("#acceptStartField");
   const acceptEndFieldButton = $("#acceptEndField");
-
+  
   acceptBoardButton.off("click");
   acceptBoardButton.on("click", function () {
-    board.acceptBoard();
-    $("#boardFields").hide();
+    const isValid = board.acceptBoard();
+    if (isValid)$("#boardFields").hide();
   });
 
   acceptStartFieldButton.off("click");
@@ -340,8 +345,69 @@ export const acceptCreatedLevel = (board: BoardCreator) => {
     const isValid = board.acceptEndField();
     if (isValid) $("#endFieldPicker").hide();
   });
+
+  
 };
+
+export const vaweCreation = (board: BoardCreator)=>{
+  const waveMaker = $("#waveMaker");
+  const acceptVawes = $("#acceptVawes");
+  const createVaweButton = $("#createVaweButton");
+  const waveCreationDisplay = $("#waveCreationDisplay");
+  
+  waveMaker.css("display","flex");
+
+  waveCreationDisplay.find(".waveItem").remove();
+  acceptVawes.off("click");
+  acceptVawes.on("click",()=>{
+    board.save()
+  })
+
+  createVaweButton.off("click");
+  createVaweButton.on("click",()=>{
+    console.log("awdwa")
+    const reg = /(\d+(?:\.\d+)?)/;
+    const time = $("#waveTimeInput").val() as string;
+    const enemies = $("#waveEnemiesInput").val() as string;
+    if (reg.test(time) && reg.test(enemies)) {
+      const newItem = $('<div>', { class:"waveItem waveContainer"});
+      $(`<div class='waveTime'>${time}</div>`).appendTo(newItem);
+      $(`<div class='waveEnemies'>${enemies}</div>`).appendTo(newItem);
+      $(`<img src="./assets/images/delete.png" alt="delete" class="vaweDeleteIcon"/>`).appendTo(newItem).on("click", (e) => {
+        e.target.parentElement?.remove();
+      });
+      newItem.appendTo(waveCreationDisplay);
+    }
+  })
+
+
+}
+
+export const getCreatedVawes=()=>{
+  const waveCreationDisplay = $("#waveCreationDisplay");
+  const waveItems = waveCreationDisplay.find(".waveItem")
+  const waves = []
+  for(let i=0;i<waveItems.length;i++){
+    const wave = {
+      "timer": parseFloat(waveItems[i].children[0].innerHTML),
+      "enemies": parseInt(waveItems[i].children[1].innerHTML)
+    }
+    waves.push(wave)
+  }
+  
+  return waves
+}
+
+export const removeWaveMaker = ()=>{
+  const waveMaker = $("#waveMaker");
+  waveMaker.css("display", "none");
+}
+
 
 export const alertPopup = (message: string) => {
   alert(message);
 };
+
+export const refresh = () =>{
+  window.location.reload();
+}
