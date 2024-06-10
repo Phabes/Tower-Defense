@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Field } from "./fields/field";
-import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType, acceptCreatedLevel, showAlert,alertPopup, vaweCreation, showWelcome, getCreatedVawes, removeWaveMaker } from "./ui";
+import { boardClick, boardMouseMove, getBoardElement, getFieldPickerType, acceptCreatedLevel, showAlert,alertPopup, vaweCreation, showWelcome, getCreatedVawes, removeWaveMaker, refreshPage } from "./ui";
 import { Game } from "./game";
 import { Board } from "./board";
 import { settings } from "./settings";
@@ -265,13 +265,17 @@ export class BoardCreator extends Board {
     };
     removeWaveMaker();
     showWelcome();
-    postLevel(level).done((res) => {
+    postLevel(level)
+    .done((res) => {
       alertPopup("Your map has been saved on the server.");
     })
-      .catch((error) => {
-        console.log(error)
-        alertPopup("Your map has not been saved due to some error.");
-      });
+    .catch((error) => {
+      if(error.status==200)
+        alertPopup("Your map has been saved on the server.");
+      else
+        alertPopup("Your map has not been saved on the server.");
+      refreshPage();
+    });
     
   }
 }

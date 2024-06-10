@@ -365,7 +365,6 @@ export const vaweCreation = (board: BoardCreator)=>{
 
   createVaweButton.off("click");
   createVaweButton.on("click",()=>{
-    console.log("awdwa")
     const reg = /(\d+(?:\.\d+)?)/;
     const time = $("#waveTimeInput").val() as string;
     const enemies = $("#waveEnemiesInput").val() as string;
@@ -408,6 +407,6 @@ export const alertPopup = (message: string) => {
   alert(message);
 };
 
-export const refresh = () =>{
+export const refreshPage = () =>{
   window.location.reload();
 }
