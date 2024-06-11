@@ -1,4 +1,4 @@
-# Tower-Defence
+# Tower-Defense
 
 Computer Game Technologies (Study Subject)
 
@@ -6,7 +6,7 @@ Computer Game Technologies (Study Subject)
 
 1. Clone project.
    ```javascript
-   git clone https://github.com/Phabes/Tower-Defence.git
+   git clone https://github.com/Phabes/Tower-Defense.git
    ```
 1. Open "backend" folder in command line.
 1. Run:
@@ -49,3 +49,9 @@ Game module provides gameplay based on created levels. The UI panel shows your m
 1. Frequency - time between two consecutive shots
 
 After completing all rounds included in selected level you can unlock next level. If you lose your HP you can try as many times as you want to complete this level.
+
+## Gameplay
+
+Part of the gameplay showed.
+
+![gameplay](https://github.com/Phabes/Tower-Defence/assets/49338133/f14d3e46-a791-44f7-8389-c7f3688cbd35)
